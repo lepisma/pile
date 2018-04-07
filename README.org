@@ -1,0 +1,3 @@
+#+TITLE: pile-wiki
+
+Source code for my [[https://lepisma.github.io/pile][wiki]] setup.
