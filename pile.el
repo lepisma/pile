@@ -4,7 +4,7 @@
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
 ;; Version: 0.0.1
-;; Package-Requires: ((emacs "25"))
+;; Package-Requires: ((emacs "25") (dash "2.13.0") (dash-functional "2.13.0") (f "0.20.0") (s "1.12.0"))
 ;; URL: https://github.com/lepisma/pile.el
 
 ;;; Commentary:
