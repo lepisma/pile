@@ -34,7 +34,6 @@
 (require 'f)
 (require 'pile-bc)
 (require 'pile-index)
-(require 'pile-images)
 (require 'pile-sitemap)
 (require 'org)
 (require 'ox-html)
@@ -68,7 +67,7 @@
 
 (defmacro with-pile-hooks (&rest body)
   "Run body with pile related export hooks set"
-  (let* ((hooks '(#'pile-bc-hook #'pile-images-pdf-hook))
+  (let* ((hooks '(#'pile-bc-hook))
          (add-forms (-map (lambda (hook) `(add-hook 'org-export-before-parsing-hook ,hook)) hooks))
          (remove-forms (-map (lambda (hook) `(remove-hook 'org-export-before-parsing-hook ,hook)) hooks)))
     `(condition-case err
