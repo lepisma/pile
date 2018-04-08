@@ -90,27 +90,6 @@
   (with-pile-hooks
    (org-publish-project "pile" arg)))
 
-(defun pile--output-valid (output-path)
-  "Check whether the given output path is expected from the current source"
-  (let ((relative-path (f-relative output-path pile-output))
-        (allowed-paths '(".nojekyll")))
-    (cond ((-find (-cut string= <> relative-path) allowed-paths)
-           t)
-          ((s-ends-with? ".html" relative-path)
-           (f-exists? (f-join pile-source (f-swap-ext relative-path "org"))))
-          (t
-           (f-exists? (f-join pile-source relative-path))))))
-
-;;;###autoload
-(defun pile-clean (&optional start-dir)
-  "Remove files from the output directory which are not in input"
-  (interactive)
-  (let ((entries (f-entries pile-output)))
-    (-each entries
-      (lambda (entry)
-        (cond ((not (pile--output-valid entry)) (f-delete entry))
-              ((f-dir? entry) (signal 'error "Not implemented")))))))
-
 ;;;###autoload
 (defun pile-setup ()
   "Setup for pile"
