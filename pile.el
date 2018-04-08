@@ -41,18 +41,23 @@
 (require 's)
 
 
+(defgroup pile nil
+  "Pile wiki")
+
 (defcustom pile-source nil
-  "Source files for pile")
+  "Source directory for pile"
+  :type 'directory
+  :group 'pile)
 
 (defcustom pile-output nil
-  "Output directory for pile")
+  "Output directory for pile"
+  :type 'directory
+  :group 'pile)
 
-(setq org-ref-bibliography-entry-format
-      '(("article" . "%a. %y. \"%t.\" <i>%j</i>, %v(%n), %p. <a class=\"bib-link\" href=\"%U\">link</a>. <a class=\"bib-link\" href=\"http://dx.doi.org/%D\">doi</a>.")
-        ("book" . "%a. %y. <i>%t</i>. %u.")
-        ("techreport" . "%a. %y. \"%t\", %i, %u.")
-        ("proceedings" . "%e. %y. \"%t\" in %S, %u.")
-        ("inproceedings" . "%a. %y. \"%t\", %p, in %b, edited by %e, %u")))
+(defcustom pile-base-url ""
+  "Url with respect to / at the host"
+  :type 'string
+  :group 'pile)
 
 ;;;###autoload
 (defun pile-clear-cache ()
@@ -93,14 +98,14 @@
 ;;;###autoload
 (defun pile-setup ()
   "Setup for pile"
-  (let ((preamble "<header>
+  (let ((preamble (format "<header>
   <div class='site-title'>
     <a href='/'>
       <img src='/assets/images/avatar32.png'>
     </a>
   </div>
   <div class='site-nav'>
-    <a href='/pile'> pile</a>
+    <a href='/%s'> pile</a>
     <a href='/feed.xml'> feed</a>
     <a href='/archive'> blog</a>
     <a href='/about'> about</a>
@@ -110,11 +115,11 @@
 </header>
 
 <div class='page-header'>
-  <div class='page-meta small'>
-    Last modified: %d %C
+  <div class='page-meta'>
+    Last modified: %%d %%C
   </div>
-  <h1>%t</h1>
-</div>")
+  <h1>%%t</h1>
+</div>" pile-base-url))
         (postamble "<footer id='footer'></footer>"))
     (setq org-publish-project-alist
           `(("pile-pages"
@@ -142,7 +147,12 @@
              :publishing-directory ,pile-output
              :publishing-function org-publish-attachment)
             ("pile" :components ("pile-pages" "pile-static")))
-          org-html-htmlize-output-type 'css)))
+          org-html-htmlize-output-type 'css
+          org-ref-bibliography-entry-format '(("article" . "%a. %y. \"%t.\" <i>%j</i>, %v(%n), %p. <a class=\"bib-link\" href=\"%U\">link</a>. <a class=\"bib-link\" href=\"http://dx.doi.org/%D\">doi</a>.")
+                                              ("book" . "%a. %y. <i>%t</i>. %u.")
+                                              ("techreport" . "%a. %y. \"%t\", %i, %u.")
+                                              ("proceedings" . "%e. %y. \"%t\" in %S, %u.")
+                                              ("inproceedings" . "%a. %y. \"%t\", %p, in %b, edited by %e, %u")))))
 
 (provide 'pile)
 
