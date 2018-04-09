@@ -36,7 +36,6 @@
 (defun pile--fix-sitemap (list)
   "Walk over the list to remove index.org items"
   (let ((ignore-patterns '("/index.org"
-                           "allpages.org"
                            "org-test.org")))
     (->> list
        (-remove (lambda (it)
