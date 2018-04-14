@@ -44,7 +44,7 @@
 (defun pile-link-export (path desc backend)
   "Export fn for link"
   (if (eq backend 'html)
-      (format "<a href=\"/%s/%s\">%s</a>" pile-base-url
+      (format "<a class=\"pile-link\" href=\"/%s/%s\">%s</a>" pile-base-url
               (f-swap-ext (pile-link--path path) "html") desc)))
 
 (provide 'pile-link)
