@@ -35,6 +35,7 @@
 (require 'pile-bc)
 (require 'pile-index)
 (require 'pile-link)
+(require 'pile-serve)
 (require 'pile-sitemap)
 (require 'org)
 (require 'ox-html)
