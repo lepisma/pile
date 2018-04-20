@@ -58,6 +58,17 @@
   "Tell if the pile path exists"
   (f-exists? (pile-page--full-path path)))
 
+(defun pile-page--org-valid? (org-file)
+  "Tell if the org file is a valid pile file"
+  (if (pile-page--file-exists? org-file)
+      (let ((ignore-list '("sitemap.org" "org-test.org")))
+        (not (member org-file ignore-list)))))
+
+(cl-defmethod pile-page-glob ((page pile-page) pattern)
+  "Glob from the page"
+  (mapcar (-cut f-relative <> pile-source)
+          (f-glob (f-join (oref page :pile-path) pattern) pile-source)))
+
 (cl-defmethod pile-page-valid? ((page pile-page))
   "Tell if a page is valid"
   (f-exists? (f-join pile-source (oref page :org-path))))
@@ -76,9 +87,17 @@
 (cl-defmethod pile-page-parent ((page pile-page))
   "Return parent pile-page for given PAGE"
   (let ((pile-path (oref page :pile-path)))
-    (if (find pile-path '("/" "")) nil
+    (if (member pile-path '("/" "")) nil
       (let ((parent-path (f-parent pile-path)))
         (pile-page-from-path (if (string= parent-path "./") "" parent-path))))))
+
+(cl-defmethod pile-page-children ((page pile-page))
+  "Return children of a PAGE"
+  (if (s-ends-with? "index.org" (oref page :org-path))
+    (let ((single-orgs (-remove (-cut s-ends-with? "index.org" <>) (pile-page-glob page "*.org")))
+          (dir-orgs (pile-page-glob page "*/index.org")))
+      (mapcar #'pile-page-from-path
+              (-filter #'pile-page--org-valid? (append single-orgs dir-orgs))))))
 
 (provide 'pile-page)
 
