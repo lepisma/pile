@@ -80,10 +80,6 @@
   (mapcar (-cut f-relative <> pile-source)
           (f-glob (f-join (oref page :pile-path) pattern) pile-source)))
 
-(cl-defmethod pile-page-valid? ((page pile-page))
-  "Tell if a page is valid"
-  (f-exists? (f-join pile-source (oref page :org-path))))
-
 (cl-defmethod pile-page-parent ((page pile-page))
   "Return parent pile-page for given PAGE"
   (let ((pile-path (oref page :pile-path)))
