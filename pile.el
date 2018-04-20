@@ -144,7 +144,7 @@
             ("pile-static"
              :base-directory ,pile-source
              :base-extension ".*"
-             :exclude ".*\.org\\|.*references.el\\|.*export.setup"
+             :exclude ".*\.org\\|.*export\.setup\\|.*auto/.*\.el\\|.*\.tex\\|.*\.bib"
              :recursive t
              :publishing-directory ,pile-output
              :publishing-function org-publish-attachment)
