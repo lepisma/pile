@@ -64,15 +64,6 @@
       (let ((ignore-list '("sitemap.org" "org-test.org")))
         (not (member org-file ignore-list)))))
 
-(cl-defmethod pile-page-glob ((page pile-page) pattern)
-  "Glob from the page"
-  (mapcar (-cut f-relative <> pile-source)
-          (f-glob (f-join (oref page :pile-path) pattern) pile-source)))
-
-(cl-defmethod pile-page-valid? ((page pile-page))
-  "Tell if a page is valid"
-  (f-exists? (f-join pile-source (oref page :org-path))))
-
 (defun pile-page-from-path (path)
   "Create a new pile page"
   (cl-multiple-value-bind (org-path pile-path)
@@ -83,6 +74,15 @@
     (pile-page :title (pile-page--file-title org-path)
                :pile-path pile-path
                :org-path org-path)))
+
+(cl-defmethod pile-page-glob ((page pile-page) pattern)
+  "Glob from the page"
+  (mapcar (-cut f-relative <> pile-source)
+          (f-glob (f-join (oref page :pile-path) pattern) pile-source)))
+
+(cl-defmethod pile-page-valid? ((page pile-page))
+  "Tell if a page is valid"
+  (f-exists? (f-join pile-source (oref page :org-path))))
 
 (cl-defmethod pile-page-parent ((page pile-page))
   "Return parent pile-page for given PAGE"
