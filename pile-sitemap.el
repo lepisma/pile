@@ -43,10 +43,25 @@
                        (-any (-cut s-contains? <> (car it)) ignore-patterns))))
        (-map (lambda (it) (if (consp it) (pile--fix-sitemap it) it))))))
 
-(defun pile-sitemap (title list)
+(defun pile-sitemap-wiki (title list)
   (concat "#+TITLE: Sitemap\n\n" (org-list-to-org (pile--fix-sitemap list))))
 
-(defun pile-sitemap-entry (entry style project)
+(defun pile-sitemap-blog (title list)
+  (concat "#+TITLE: Sitemap\n\n" (org-list-to-org list)))
+
+(defun pile-sitemap-format-wiki (entry style project)
+  (cond ((not (directory-name-p entry))
+         (format "[[file:%s][%s]]"
+                 entry
+                 (org-publish-find-title entry project)))
+        ((eq style 'tree)
+         (let ((index-file (f-join entry "index.org")))
+           (format "[[file:%s][%s]]"
+                   index-file
+                   (org-publish-find-title index-file project))))
+        (t entry)))
+
+(defun pile-sitemap-format-blog (entry style project)
   (cond ((not (directory-name-p entry))
          (format "[[file:%s][%s]]"
                  entry

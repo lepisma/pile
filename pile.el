@@ -37,54 +37,96 @@
 (require 'pile-link)
 (require 'pile-serve)
 (require 'pile-sitemap)
+(require 'pile-utils)
 (require 'org)
 (require 'ox-html)
 (require 'ox-publish)
 (require 's)
-
+(require 'helm)
 
 (defgroup pile nil
-  "Pile wiki")
+  "Pile wiki"
+  :group 'org)
 
-(defcustom pile-source nil
-  "Source directory for pile"
-  :type 'directory
+(defcustom pile-projects nil
+  "List of managed pile projects"
   :group 'pile)
 
-(defcustom pile-output nil
-  "Output directory for pile"
-  :type 'directory
-  :group 'pile)
+(defvar pile-hooks '((wiki . (#'pile-bc-hook))
+                     (blog . ())
+                     (static . ()))
+  "Hooks for each project type")
 
-(defcustom pile-base-url ""
-  "Url with respect to / at the host"
-  :type 'string
-  :group 'pile)
+(defclass pile-project ()
+  ((name :initarg :name
+         :type string
+         :documentation "Name for the project")
+   (base-url :initarg :base-url
+             :type string
+             :documentation "Url with respect to / at the host")
+   (input-dir :initarg :input-dir
+              :type string
+              :documentation "Root input directory for project")
+   (output-dir :initarg :output-dir
+               :type string
+               :documentation "Output directory for the project")
+   (type :initarg :type
+         :type symbol
+         :documentation "Type of the project, a wiki or a blog")
+   (postamble :initarg :postamble
+              :type string
+              :documentation "Postamble for the pages")
+   (preamble :initarg :preamble
+             :type string
+             :documentation "Preamble for the pages")))
 
-;;;###autoload
-(defun pile-clear-cache ()
-  "Clear org-publish-cache"
-  (interactive)
-  (setq org-publish-cache nil)
-  (let ((cache-root (f-full "~/.emacs.d/.cache/.org-timestamps/")))
-    (->> '("pile-pages.cache" "pile-static.cache")
-       (-map (-cut f-join cache-root <>))
-       (-filter #'f-exists?)
-       (-map #'f-delete))))
+(cl-defmethod pile-project-static-config ((pj pile-project))
+  "Get org-publish static config for the project"
+  `(,(format "pile-%s-static" (oref pj :name))
+    :base-directory ,(oref pj :input-dir)
+    :base-extension ".*"
+    :exclude ".*\.org\\|.*export\.setup\\|.*auto/.*\.el\\|.*\.tex\\|.*\.bib"
+    :recursive t
+    :publishing-directory ,(oref pj :output-dir)
+    :publishing-function org-publish-attachment))
 
-(defmacro with-pile-hooks (&rest body)
-  "Run body with pile related export hooks set"
-  (let* ((hooks '(#'pile-bc-hook))
-         (add-forms (-map (lambda (hook) `(add-hook 'org-export-before-parsing-hook ,hook)) hooks))
-         (remove-forms (-map (lambda (hook) `(remove-hook 'org-export-before-parsing-hook ,hook)) hooks)))
-    `(condition-case err
-         (progn
-           ,@add-forms
-           ,@body
-           ,@remove-forms)
-       (error (progn
-                ,@remove-forms
-                (signal (car err) (cdr err)))))))
+(cl-defmethod pile-project-pages-config ((pj pile-project))
+  "Get org-publish config for pages"
+  (let ((type (oref pj :type)))
+    `(,(format "pile-%s-pages" (oref pj :name))
+      :auto-sitemap t
+      :sitemap-filename "sitemap.org"
+      :sitemap-title "Sitemap"
+      :sitemap-format-entry ,(cl-ecase type
+                               ('wiki #'pile-sitemap-format-wiki)
+                               ('blog #'pile-sitemap-format-blog))
+      :sitemap-function ,(cl-ecase type
+                           ('wiki #'pile-sitemap-wiki)
+                           ('blog #'pile-sitemap-blog))
+      :base-directory ,(oref pj :input-dir)
+      :recursive t
+      :publishing-directory ,(oref pj :output-dir)
+      :publishing-function org-html-publish-to-html
+      :htmlized-source nil
+      :html-checkbox-type unicode
+      :html-html5-fancy t
+      :html-postamble ,(oref pj :postamble)
+      :html-preamble ,(oref pj :preamble))))
+
+(cl-defmethod pile-project-config ((pj pile-project))
+  "Pile project config for org-publish"
+  (let ((name (oref pj :name)))
+    (if (eq (oref pj :type) 'static) (list (pile-project-static-config pj))
+      (list (pile-project-static-config pj)
+            (pile-project-pages-config pj)
+            `(,(format "pile-%s" name)
+              :components (,(format "pile-%s-pages" name)
+                           ,(format "pile-%s-static" name)))))))
+
+(cl-defmethod pile-project-publish ((pj pile-project) &optional arg)
+  "Publish the project"
+  (let ((hooks (cdr (assoc (oref pj :type) pile-hooks))))
+    (with-pile-hooks hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
 
 (defun pile-publish-current-file (arg)
   (interactive "P")
@@ -94,67 +136,22 @@
 ;;;###autoload
 (defun pile-publish (arg)
   (interactive "P")
-  (with-pile-hooks
-   (org-publish-project "pile" arg)))
+  (helm :sources (helm-build-sync-source "Pile projects"
+                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj)) pile-projects)
+                   :action (lambda (pj) (pile-project-publish pj arg)))
+        :buffer "*helm pile publish*"))
 
 ;;;###autoload
 (defun pile-setup ()
   "Setup for pile"
-  (let ((preamble (format "<header>
-  <div class='site-title'>
-    <a href='/'>
-      <img src='/assets/images/avatar32.png'>
-    </a>
-  </div>
-  <div class='site-nav'>
-    <a href='/%s'> pile</a>
-    <a href='/feed.xml'> feed</a>
-    <a href='/archive'> blog</a>
-    <a href='/about'> about</a>
-  </div>
-  <div class='clearfix'>
-  </div>
-</header>
-
-<div class='page-header'>
-  <div class='page-meta'>
-    Last modified: %%d %%C
-  </div>
-  <h1>%%t</h1>
-</div>" pile-base-url))
-        (postamble "<footer id='footer'></footer>"))
-    (setq org-publish-project-alist
-          `(("pile-pages"
-             :auto-sitemap t
-             :sitemap-filename "sitemap.org"
-             :sitemap-title "Sitemap"
-             :sitemap-format-entry pile-sitemap-entry
-             :sitemap-function pile-sitemap
-             :base-directory ,pile-source
-             :base-extension "org"
-             :recursive t
-             :publishing-directory ,pile-output
-             :publishing-function org-html-publish-to-html
-             :htmlized-source nil
-             :html-checkbox-type unicode
-             :html-doctype "html5"
-             :html-html5-fancy t
-             :html-postamble ,postamble
-             :html-preamble ,preamble)
-            ("pile-static"
-             :base-directory ,pile-source
-             :base-extension ".*"
-             :exclude ".*\.org\\|.*export\.setup\\|.*auto/.*\.el\\|.*\.tex\\|.*\.bib"
-             :recursive t
-             :publishing-directory ,pile-output
-             :publishing-function org-publish-attachment)
-            ("pile" :components ("pile-pages" "pile-static")))
-          org-html-htmlize-output-type 'css
-          org-ref-bibliography-entry-format '(("article" . "%a. %y. \"%t.\" <i>%j</i>, %v(%n), %p. <a class=\"bib-link\" href=\"%U\">link</a>. <a class=\"bib-link\" href=\"http://dx.doi.org/%D\">doi</a>.")
-                                              ("book" . "%a. %y. <i>%t</i>. %u.")
-                                              ("techreport" . "%a. %y. \"%t\", %i, %u.")
-                                              ("proceedings" . "%e. %y. \"%t\" in %S, %u.")
-                                              ("inproceedings" . "%a. %y. \"%t\", %p, in %b, edited by %e, %u")))))
+  (-map (lambda (pj) (setq org-publish-project-alist (append org-publish-project-alist (pile-project-config pj)))) pile-projects)
+  (setq org-html-htmlize-output-type 'css
+        org-ref-bibliography-entry-format
+        '(("article" . "%a. %y. \"%t.\" <i>%j</i>, %v(%n), %p. <a class=\"bib-link\" href=\"%U\">link</a>. <a class=\"bib-link\" href=\"http://dx.doi.org/%D\">doi</a>.")
+          ("book" . "%a. %y. <i>%t</i>. %u.")
+          ("techreport" . "%a. %y. \"%t\", %i, %u.")
+          ("proceedings" . "%e. %y. \"%t\" in %S, %u.")
+          ("inproceedings" . "%a. %y. \"%t\", %p, in %b, edited by %e, %u"))))
 
 (provide 'pile)
 
