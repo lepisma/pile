@@ -52,7 +52,7 @@
   "List of managed pile projects"
   :group 'pile)
 
-(defvar pile-hooks '((wiki . (#'pile-bc-hook))
+(defvar pile-hooks '((wiki . (pile-bc-hook))
                      (blog . ())
                      (static . ()))
   "Hooks for each project type")
@@ -116,7 +116,10 @@
 (cl-defmethod pile-project-config ((pj pile-project))
   "Pile project config for org-publish"
   (let ((name (oref pj :name)))
-    (if (eq (oref pj :type) 'static) (list (pile-project-static-config pj))
+    (if (eq (oref pj :type) 'static)
+        (list (pile-project-static-config pj)
+              `(,(format "pile-%s" name)
+                :components (,(format "pile-%s-static" name))))
       (list (pile-project-static-config pj)
             (pile-project-pages-config pj)
             `(,(format "pile-%s" name)
@@ -129,9 +132,11 @@
     (with-pile-hooks hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
 
 (defun pile-publish-current-file (arg)
+  "Publish only the current file"
   (interactive "P")
-  (with-pile-hooks
-   (org-publish-current-file arg)))
+  (let* ((pj (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) (buffer-file-name))) pile-projects))
+         (hooks (cdr (assoc (oref pj :type) pile-hooks))))
+    (with-pile-hooks hooks (org-publish-current-file arg))))
 
 ;;;###autoload
 (defun pile-publish (arg)

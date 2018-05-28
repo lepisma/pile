@@ -43,16 +43,14 @@
 
 (defmacro with-pile-hooks (hooks &rest body)
   "Run body with pile related export hooks set"
-  `(let* ((add-forms (-map (lambda (hook) (add-hook 'org-export-before-parsing-hook hook)) ,hooks))
-          (remove-forms (-map (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)) ,hooks)))
-     (condition-case err
-         (progn
-           add-forms
-           ,@body
-           remove-forms)
-       (error (progn
-                remove-forms
-                (signal (car err) (cdr err)))))))
+  `(condition-case err
+       (progn
+         (-each ,hooks (lambda (hook) (add-hook 'org-export-before-parsing-hook hook)))
+         ,@body
+         (-each ,hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook))))
+     (error (progn
+              (-each ,hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
+              (signal (car err) (cdr err))))))
 
 (provide 'pile-utils)
 

@@ -31,6 +31,9 @@
 
 (org-add-link-type "pile" #'pile-link-follow #'pile-link-export)
 
+;; HACK
+(setq pile-source "/run/media/lepisma/Data/Projects/pile/wiki/")
+
 (defun pile-link--path (path)
   (let ((pile-path (f-join pile-source path)))
     (if (f-dir? pile-path)
