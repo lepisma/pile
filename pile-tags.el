@@ -32,7 +32,7 @@
 
 (defun pile-tags-parse-buffer ()
   "Return a list of tags from the buffer"
-  (goto-char 0)
+  (goto-char 1)
   (if (search-forward "#+TAGS:" nil t)
       (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
         (-map #'s-trim (s-split "," text)))))
@@ -47,8 +47,9 @@
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname)))
     (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
-      (pile--goto-top)
-      (insert (pile-tags-format-tags (pile-tags-parse-buffer))))))
+      (let ((tags (pile-tags-parse-buffer)))
+        (pile--goto-top)
+        (insert (pile-tags-format-tags tags))))))
 
 (provide 'pile-tags)
 
