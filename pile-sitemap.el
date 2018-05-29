@@ -46,6 +46,7 @@
 (defun pile-sitemap-wiki (title list)
   (concat "#+TITLE: Sitemap\n\n" (org-list-to-org (pile--fix-sitemap list))))
 
+;; TODO Fix this
 (defun pile-sitemap-blog (title list)
   (concat "#+TITLE: Sitemap\n\n" (org-list-to-org list)))
 
@@ -61,17 +62,9 @@
                    (org-publish-find-title index-file project))))
         (t entry)))
 
+;; TODO Fix this
 (defun pile-sitemap-format-blog (entry style project)
-  (cond ((not (directory-name-p entry))
-         (format "[[file:%s][%s]]"
-                 entry
-                 (org-publish-find-title entry project)))
-        ((eq style 'tree)
-         (let ((index-file (f-join entry "index.org")))
-           (format "[[file:%s][%s]]"
-                   index-file
-                   (org-publish-find-title index-file project))))
-        (t entry)))
+  (pile-sitemap-format-wiki entry style project))
 
 (provide 'pile-sitemap)
 
