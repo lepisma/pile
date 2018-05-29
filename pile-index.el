@@ -36,19 +36,6 @@
   (second (s-split "TITLE: " (-find (-cut s-starts-with? "#+TITLE:" <>)
                                     (s-split "\n" (f-read-text file))))))
 
-(defun pile-index-regenerate ()
-  "Regenerate index for current dir"
-  (interactive)
-  (let ((insert-at (point)))
-    (goto-char (point-min))
-    (if (search-forward "* Pages in this section" nil t)
-        (progn
-          (delete-line)
-          (delete-region (point) (point-max))
-          (setq insert-at (point))))
-    (goto-char insert-at)
-    (pile-index-insert)))
-
 (defun pile-index-parse-dir (dir)
   "Parse directory for org files recursively"
   (let ((items (f-entries dir))
@@ -80,11 +67,9 @@
                (setq output (s-append (pile-index-format it (+ (or level 0) 1)) output))))))
     output))
 
-(defun pile-index-insert ()
-  "Generate and insert index for the current dir."
-  (let ((file-tree (pile-index-parse-dir default-directory)))
-    (insert "* Pages in this section\n\n")
-    (insert (pile-index-format file-tree))))
+(defun pile-index ()
+  "Return string representation of the index tree"
+  (pile-index-format (pile-index-parse-dir default-directory)))
 
 (provide 'pile-index)
 
