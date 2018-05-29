@@ -28,15 +28,19 @@
 
 (require 'w)
 
+(defcustom pile-serve-dir nil
+  "Directory to serve by default"
+  :group 'pile)
+
 (defun pile-serve ()
   "Start server for pile"
   (interactive)
-  (w-start pile-output))
+  (w-start pile-serve-dir))
 
 (defun pile-serve-stop ()
   "Stop pile server"
   (interactive)
-  (let ((wi (w-dir-live-p pile-output)))
+  (let ((wi (w-dir-live-p pile-serve-dir)))
     (if wi (w-kill wi))))
 
 (provide 'pile-serve)
