@@ -34,6 +34,7 @@
 (require 'f)
 (require 'pile-bc)
 (require 'pile-tags)
+(require 'pile-date)
 (require 'pile-index)
 (require 'pile-link)
 (require 'pile-serve)
@@ -54,7 +55,7 @@
   :group 'pile)
 
 (defvar pile-hooks '((wiki . (pile-bc-hook))
-                     (blog . (pile-tags-hook))
+                     (blog . (pile-tags-hook pile-date-hook))
                      (static . ()))
   "Hooks for each project type")
 
