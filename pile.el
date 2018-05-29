@@ -97,15 +97,14 @@
   "Get org-publish config for pages"
   (let ((type (oref pj :type)))
     `(,(format "pile-%s-pages" (oref pj :name))
-      :auto-sitemap t
-      :sitemap-filename "sitemap.org"
-      :sitemap-title "Sitemap"
-      :sitemap-format-entry ,(cl-ecase type
-                               ('wiki #'pile-sitemap-format-wiki)
-                               ('blog #'pile-sitemap-format-blog))
-      :sitemap-function ,(cl-ecase type
-                           ('wiki #'pile-sitemap-wiki)
-                           ('blog #'pile-sitemap-blog))
+      ,@(if (eq type 'wiki)
+            (list
+             :auto-sitemap t
+             :sitemap-filename "sitemap.org"
+             :sitemap-title "Sitemap"
+             :sitemap-format-entry 'pile-sitemap-format-wiki
+             :sitemap-function 'pile-sitemap-wiki)
+          (list :auto-sitemap nil))
       :base-directory ,(oref pj :input-dir)
       :recursive t
       :publishing-directory ,(oref pj :output-dir)
