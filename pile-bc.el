@@ -26,16 +26,9 @@
 
 ;;; Code:
 
-
-(require 'org)
-(require 'ox)
 (require 'f)
 (require 's)
-
-(defun pile-bc--relative (file-name)
-  "Get relative path of the file from pile root"
-  (let ((rel-path (f-relative file-name pile-source)))
-    (s-chop-suffix ".org" rel-path)))
+(require 'pile-utils)
 
 (defun pile-bc--parents (rel-path)
   "Break path into roots"
@@ -63,28 +56,30 @@
                                  (format "<a href='%s'>%s</a>" (cdr parent) (car parent)))
                                parents)))
 
-(defun pile-bc--linkify-root (rel-path)
+(defun pile-bc--linkify-root (rel-path root-dir)
   "Return link for root file"
   (let* ((root-input-file "index.org")
-         (full-path (f-join pile-source rel-path))
-         (root-rel-path (f-relative (f-join pile-source root-input-file) full-path))
+         (full-path (f-join root-dir rel-path))
+         (root-rel-path (f-relative (f-join root-dir root-input-file) full-path))
          (root-output-file (f-swap-ext root-rel-path "html")))
     (format "<a href='%s'>%s</a>" (substring-no-properties root-output-file 1) "≡ index")))
 
-(defun pile-bc-generate-breadcrumbs (rel-path)
+(defun pile-bc-generate-breadcrumbs (rel-path root-dir)
   "Generate html breadcrumbs"
   (let ((parents (pile-bc--parents rel-path)))
     (format "#+HTML:<div id='breadcrumbs'>%s / %s %s</div>"
-            (pile-bc--linkify-root rel-path)
+            (pile-bc--linkify-root rel-path root-dir)
             (if (zerop (length parents)) "" (format "%s /" (pile-bc--linkify-parents parents)))
             (pile-bc--page-title rel-path))))
 
 (defun pile-bc-hook (_)
   "Function to insert breadcrumbs in the exported file"
-  (let ((rel-path (pile-bc--relative (buffer-file-name))))
+  (let* ((fname (buffer-file-name))
+         (pj (pile-get-project-from-file fname))
+         (rel-path (s-chop-suffix ".org" (f-relative fname (oref pj :input-dir)))))
     (unless (string-equal "sitemap" rel-path)
       (pile--goto-top)
-      (insert (pile-bc-generate-breadcrumbs rel-path)))))
+      (insert (pile-bc-generate-breadcrumbs rel-path (oref pj :input-dir))))))
 
 (provide 'pile-bc)
 
