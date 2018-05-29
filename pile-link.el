@@ -27,28 +27,35 @@
 ;;; Code:
 
 (require 'f)
+(require 's)
 (require 'org)
+(require 'dash)
 
 (org-add-link-type "pile" #'pile-link-follow #'pile-link-export)
 
-;; HACK
-(setq pile-source "/run/media/lepisma/Data/Projects/pile/wiki/")
-
-(defun pile-link--path (path)
-  (let ((pile-path (f-join pile-source path)))
+(defun pile-link--path (path root-dir)
+  (let ((pile-path (f-join root-dir path)))
     (if (f-dir? pile-path)
         (f-join path "index.org")
       (format "%s.org" path))))
 
+(defun pile-link-parse-path (path)
+  (let* ((splits (s-split-up-to ":" path 1)))
+    (list (second splits)
+          (-find (lambda (pj) (string-equal (car splits) (oref pj :name))) pile-projects))))
+
 (defun pile-link-follow (path)
   "Open the path in a buffer"
-  (find-file-existing (f-join pile-source (pile-link--path path))))
+  (-let [(p-path pj) (pile-link-parse-path path)]
+    (let ((root-dir (oref pj :input-dir)))
+      (find-file-existing (f-join root-dir (pile-link--path p-path root-dir))))))
 
 (defun pile-link-export (path desc backend)
   "Export fn for link"
-  (if (eq backend 'html)
-      (format "<a class=\"pile-link\" href=\"/%s/%s\">%s</a>" pile-base-url
-              (f-swap-ext (pile-link--path path) "html") desc)))
+  (-let [(p-path pj) (pile-link-parse-path path)]
+    (if (eq backend 'html)
+        (format "<a class=\"pile-link\" href=\"/%s/%s\">%s</a>" (oref pj :base-url)
+                (f-swap-ext (pile-link--path p-path (oref pj :input-dir)) "html") desc))))
 
 (provide 'pile-link)
 
