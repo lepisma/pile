@@ -47,6 +47,14 @@
         (insert "\n"))
     (signal 'error (format "SETUPFILE line not found in %s." buffer-file-name))))
 
+(defun pile-get-project-from-file (file-name)
+  "Return project from file-name"
+  (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) file-name)) pile-projects))
+
+(defun pile-get-project (name)
+  "Get project by name"
+  (-find (lambda (pj) (string-equal name (oref pj :name))) pile-projects))
+
 ;;;###autoload
 (defun pile-clear-cache ()
   "Clear org-publish-cache"

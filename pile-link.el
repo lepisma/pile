@@ -30,6 +30,7 @@
 (require 's)
 (require 'org)
 (require 'dash)
+(require 'pile-utils)
 
 (org-add-link-type "pile" #'pile-link-follow #'pile-link-export)
 
@@ -42,7 +43,7 @@
 (defun pile-link-parse-path (path)
   (let* ((splits (s-split-up-to ":" path 1)))
     (list (second splits)
-          (-find (lambda (pj) (string-equal (car splits) (oref pj :name))) pile-projects))))
+          (pile-get-project (car splits)))))
 
 (defun pile-link-follow (path)
   "Open the path in a buffer"

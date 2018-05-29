@@ -137,7 +137,7 @@
 (defun pile-publish-current-file (arg)
   "Publish only the current file"
   (interactive "P")
-  (let* ((pj (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) (buffer-file-name))) pile-projects))
+  (let* ((pj (pile-get-project-from-file (buffer-file-name)))
          (hooks (cdr (assoc (oref pj :type) pile-hooks))))
     (with-pile-hooks hooks (org-publish-current-file arg))))
 
