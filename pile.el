@@ -33,6 +33,7 @@
 (require 'dash-functional)
 (require 'f)
 (require 'pile-bc)
+(require 'pile-tags)
 (require 'pile-index)
 (require 'pile-link)
 (require 'pile-serve)
@@ -53,7 +54,7 @@
   :group 'pile)
 
 (defvar pile-hooks '((wiki . (pile-bc-hook))
-                     (blog . ())
+                     (blog . (pile-tags-hook))
                      (static . ()))
   "Hooks for each project type")
 
