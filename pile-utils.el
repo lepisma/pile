@@ -30,6 +30,23 @@
 (require 'dash-functional)
 (require 'f)
 
+(defun pile--at-header? ()
+  "Return if at a header or empty line"
+  (let ((line-text (s-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
+    (or (s-equals? line-text "")
+        (and (s-starts-with? "#+" line-text)
+             (not (s-starts-with? "#+begin" (downcase line-text)))))))
+
+(defun pile--goto-top ()
+  "Move point to the top of file just after the headers"
+  (goto-char 0)
+  (if (search-forward "#+SETUPFILE:" nil t)
+      (progn
+        (while (pile--at-header?) (next-line))
+        (previous-line)
+        (insert "\n"))
+    (signal 'error (format "SETUPFILE line not found in %s." buffer-file-name))))
+
 ;;;###autoload
 (defun pile-clear-cache ()
   "Clear org-publish-cache"
