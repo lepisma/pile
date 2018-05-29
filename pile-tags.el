@@ -26,29 +26,29 @@
 
 ;;; Code:
 
-(require 'org)
-(require 'ox)
 (require 'f)
 (require 's)
+(require 'pile-utils)
 
-(defun pile-tags-parse-buffer (buffer)
+(defun pile-tags-parse-buffer ()
   "Return a list of tags from the buffer"
-  (with-current-buffer buffer
-    (goto-char 0)
-    (if (search-forward "#+TAGS:" nil t)
-        (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
-          (-map #'s-trim (s-split "," text))))))
+  (goto-char 0)
+  (if (search-forward "#+TAGS:" nil t)
+      (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
+        (-map #'s-trim (s-split "," text)))))
 
 (defun pile-tags-format-tags (tags)
   "Format tags and return html"
-  (format "#+HTML: <div class='page-tags'>%s</div>" (s-join "" (-map (lambda (tag) (format "<a href='#'>%s</a>" tag)) tags))))
+  (format "#+HTML: <div class='page-tags'>%s</div>"
+          (s-join "" (-map (lambda (tag) (format "<a href='#'>%s</a>" tag)) tags))))
 
 (defun pile-tags-hook (_)
   "Function to insert tag list in the exported file"
-  (let ((tags (pile-tags-parse-buffer (current-buffer))))
-    (unless (string-equal "sitemap.org" (f-filename (buffer-file-name)))
+  (let* ((fname (buffer-file-name))
+         (pj (pile-get-project-from-file fname)))
+    (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
       (pile--goto-top)
-      (insert (pile-tags-format-tags tags)))))
+      (insert (pile-tags-format-tags (pile-tags-parse-buffer))))))
 
 (provide 'pile-tags)
 

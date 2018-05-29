@@ -26,29 +26,28 @@
 
 ;;; Code:
 
-(require 'org)
-(require 'ox)
 (require 'f)
 (require 's)
+(require 'pile-utils)
 
-(defun pile-date-parse-date (buffer)
+(defun pile-date-parse-date ()
   "Get date from the buffer path"
-  (with-current-buffer buffer
-    (let* ((path (buffer-file-name))
-           (date-path (if (string-equal "index.org" (f-filename path))
-                          (f-parent (f-parent path))
-                        (f-parent path))))
-      (s-replace "/" "-" (substring date-path -10)))))
+  (let* ((path (buffer-file-name))
+         (date-path (if (string-equal "index.org" (f-filename path))
+                        (f-parent (f-parent path))
+                      (f-parent path))))
+    (s-replace "/" "-" (substring date-path -10))))
 
 (defun pile-date-hook (_)
   "Function to insert date information in the exported file"
-  (let ((date (pile-date-parse-date (current-buffer))))
-    (unless (string-equal "sitemap.org" (f-filename (buffer-file-name)))
+  (let* ((fname (buffer-file-name))
+         (pj (pile-get-project-from-file fname)))
+    (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
       (goto-char 1)
       (search-forward "#+TITLE:")
       (goto-char (line-end-position))
       (insert "\n")
-      (insert (format "#+DATE: <%s>" date)))))
+      (insert (format "#+DATE: <%s>" (pile-date-parse-date))))))
 
 (provide 'pile-date)
 

@@ -26,37 +26,36 @@
 
 ;;; Code:
 
-(require 'org)
-(require 'ox)
 (require 'f)
 (require 's)
+(require 'pile-utils)
 
-(defun pile-dropcap-goto-first-char (buffer)
-  (with-current-buffer buffer
-    (pile--goto-top)
-    ;; Now search for the next valid block
-    (let ((move t))
-      (while move
-        (let ((line-text (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
-          (cond
-           ((s-starts-with? "#+BEGIN" line-text)
-            (progn
-              (search-forward "#+END")
-              (next-line)
-              (goto-char (line-beginning-position))))
-           ((s-starts-with? "#+" line-text)
-            (next-line))
-           ((string-equal "" line-text)
-            (next-line))
-           (t (setq move nil))))))))
+(defun pile-dropcap-goto-first-char ()
+  (pile--goto-top)
+  ;; Now search for the next valid block
+  (let ((move t))
+    (while move
+      (let ((line-text (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+        (cond
+         ((s-starts-with? "#+BEGIN" line-text)
+          (progn
+            (search-forward "#+END")
+            (next-line)
+            (goto-char (line-beginning-position))))
+         ((s-starts-with? "#+" line-text)
+          (next-line))
+         ((string-equal "" line-text)
+          (next-line))
+         (t (setq move nil)))))))
 
 (defun pile-dropcap-hook (_)
   "Function to add dropcap"
-  (unless (string-equal "sitemap.org" (f-filename (buffer-file-name)))
-    (pile-dropcap-goto-first-char (current-buffer))
-    (let ((char (buffer-substring-no-properties (point) (+ 1 (point)))))
-      (delete-char 1)
-      (insert (format "@@html:<span class='dropcap'>%s</span>@@" char)))))
+  (let* ((fname (buffer-file-name))
+         (pj (pile-get-project-from-file fname)))
+    (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
+      (pile-dropcap-goto-first-char)
+      (insert (format "@@html:<span class='dropcap'>%s</span>@@"
+                      (buffer-substring-no-properties (point) (+ 1 (point))))))))
 
 (provide 'pile-dropcap)
 
