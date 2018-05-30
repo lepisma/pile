@@ -37,6 +37,11 @@
         (and (s-starts-with? "#+" line-text)
              (not (s-starts-with? "#+begin" (downcase line-text)))))))
 
+(defun pile--file-title (file)
+  "Return title for an org file"
+  (second (s-split "TITLE: " (-find (-cut s-starts-with? "#+TITLE:" <>)
+                                    (s-split "\n" (f-read-text file))))))
+
 (defun pile--goto-top ()
   "Move point to the top of file just after the headers"
   (goto-char 0)

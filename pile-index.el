@@ -30,11 +30,7 @@
 (require 'dash-functional)
 (require 'f)
 (require 's)
-
-(defun pile-index--file-title (file)
-  "Return title for an org file"
-  (second (s-split "TITLE: " (-find (-cut s-starts-with? "#+TITLE:" <>)
-                                    (s-split "\n" (f-read-text file))))))
+(require 'pile-utils)
 
 (defun pile-index-parse-dir (dir)
   "Parse directory for org files recursively"
@@ -61,7 +57,7 @@
       (lambda (it)
         (cond ((stringp it)
                (let ((link-path (f-relative it default-directory))
-                     (link-title (pile-index--file-title it)))
+                     (link-title (pile--file-title it)))
                  (setq output (s-append (format "%s- [[./%s][%s]]\n" indent link-path link-title) output))))
               ((consp it)
                (setq output (s-append (pile-index-format it (+ (or level 0) 1)) output))))))
