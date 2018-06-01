@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'f)
+(require 'dash)
 (require 'pile-utils)
 (require 'pile-tags)
 (require 'pile-date)
@@ -63,7 +64,11 @@
             (if tags (pile-tags-format-tags tags) ""))))
 
 (defun pile-archive ()
-  (s-join "\n" (-map #'pile-archive-format (pile-archive-parse))))
+  (let ((items (pile-archive-parse)))
+    (s-join "\n" (-map #'pile-archive-format (-sort (lambda (a b)
+                                                      (string-lessp (cdr (assoc 'date b))
+                                                                    (cdr (assoc 'date a))))
+                                                    items)))))
 
 (provide 'pile-archive)
 
