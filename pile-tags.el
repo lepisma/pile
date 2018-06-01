@@ -37,10 +37,11 @@
       (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
         (-map #'s-trim (s-split "," text)))))
 
-(defun pile-tags-format-tags (tags)
+(defun pile-tags-format-tags (tags &optional archive-page)
   "Format tags and return html"
   (format "#+HTML: <div class='page-tags'>%s</div>"
-          (s-join "" (-map (lambda (tag) (format "<a href='#'>%s</a>" tag)) tags))))
+          (s-join "" (-map (lambda (tag) (format "<a href='%s#%s'>%s</a>"
+                                            (or archive-page "") tag tag)) tags))))
 
 (defun pile-tags-hook (_)
   "Function to insert tag list in the exported file"
@@ -49,7 +50,8 @@
     (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
       (let ((tags (pile-tags-parse-buffer)))
         (pile--goto-top)
-        (insert (pile-tags-format-tags tags))))))
+        (insert (pile-tags-format-tags tags
+                                       (f-relative (oref pj :input-dir) fname)))))))
 
 (provide 'pile-tags)
 

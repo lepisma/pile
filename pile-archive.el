@@ -49,16 +49,18 @@
                   (date . ,(pile-date-parse-date)))))) org-files)))
 
 (defun pile-archive-format (page-alist)
-  (let ((tags (cdr (assoc 'tags page-alist)))
-        (short-template (format "#+HTML: <div class='page-date'>%s</div>
-#+ATTR_HTML: :class page-link
-[[file:%s][%s]]"
-                                (cdr (assoc 'date page-alist))
-                                (cdr (assoc 'link page-alist))
-                                (cdr (assoc 'title page-alist)))))
-    (if tags
-        (concat short-template "\n" (pile-tags-format-tags tags))
-      short-template)))
+  (let ((tags (cdr (assoc 'tags page-alist))))
+    (format "
+#+HTML: <div class='archive-item'>
+#+HTML: <div class='page-meta'>%s</div>
+#+ATTR_HTML: :class archive-title
+[[file:%s][%s]]
+%s
+#+HTML: </div>"
+            (cdr (assoc 'date page-alist))
+            (cdr (assoc 'link page-alist))
+            (cdr (assoc 'title page-alist))
+            (if tags (pile-tags-format-tags tags) ""))))
 
 (defun pile-archive ()
   (s-join "\n" (-map #'pile-archive-format (pile-archive-parse))))
