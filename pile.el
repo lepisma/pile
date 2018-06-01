@@ -32,6 +32,7 @@
 (require 'dash)
 (require 'dash-functional)
 (require 'f)
+(require 'pile-archive)
 (require 'pile-bc)
 (require 'pile-tags)
 (require 'pile-date)
