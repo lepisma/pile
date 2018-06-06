@@ -39,9 +39,12 @@
 
 (defun pile-tags-format-tags (tags &optional archive-page)
   "Format tags and return html"
-  (format "#+HTML: <div class='page-tags'>%s</div>"
+  (concat "#+BEGIN_EXPORT html
+<div class='page-tags'>"
           (s-join "" (-map (lambda (tag) (format "<a href='%s#%s'>%s</a>"
-                                            (or archive-page "") tag tag)) tags))))
+                                            (or archive-page "") tag tag)) tags))
+          "</div>
+#+END_EXPORT"))
 
 (defun pile-tags-hook (_)
   "Function to insert tag list in the exported file"
