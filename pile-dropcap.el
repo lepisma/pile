@@ -40,8 +40,7 @@
          ((s-starts-with? "#+BEGIN" line-text)
           (progn
             (search-forward "#+END")
-            (next-line)
-            (goto-char (line-beginning-position))))
+            (next-line)))
          ((s-starts-with? "#+" line-text)
           (next-line))
          ((string-equal "" line-text)
@@ -55,7 +54,8 @@
     (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
       (pile-dropcap-goto-first-char)
       (insert (format "@@html:<span class='dropcap'>%s</span>@@"
-                      (buffer-substring-no-properties (point) (+ 1 (point))))))))
+                      (buffer-substring-no-properties (point) (+ 1 (point)))))
+      (delete-char 1))))
 
 (provide 'pile-dropcap)
 
