@@ -51,8 +51,10 @@
 (defun pile-dropcap-hook (_)
   "Function to add dropcap"
   (let* ((fname (buffer-file-name))
-         (pj (pile-get-project-from-file fname)))
-    (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
+         (pj (pile-get-project-from-file fname))
+         (dc-opt (assoc "dropcap" (pile-read-options))))
+    (unless (or (string-equal fname (f-join (oref pj :input-dir) "index.org"))
+                (and dc-opt (null (cdr dc-opt))))
       (pile-dropcap-goto-first-char)
       (insert (format "@@html:<span class='dropcap'>%s</span>@@"
                       (buffer-substring-no-properties (point) (+ 1 (point)))))
