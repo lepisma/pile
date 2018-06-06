@@ -45,7 +45,8 @@
           (next-line))
          ((string-equal "" line-text)
           (next-line))
-         (t (setq move nil)))))))
+         (t (setq move nil)))))
+    (goto-char (line-beginning-position))))
 
 (defun pile-dropcap-hook (_)
   "Function to add dropcap"
