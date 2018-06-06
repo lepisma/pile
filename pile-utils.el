@@ -70,7 +70,7 @@
   "Read options from org file"
   (save-excursion
     (goto-char (point-min))
-    (if (search-forward "#+PILE:")
+    (if (search-forward "#+PILE:" nil t)
         (let ((text (buffer-substring-no-properties (point) (line-end-position))))
           (pile--parse-option (s-trim text))))))
 
