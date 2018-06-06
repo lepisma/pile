@@ -115,6 +115,7 @@
       :publishing-directory ,(oref pj :output-dir)
       :publishing-function org-html-publish-to-html
       :htmlized-source nil
+      :html-doctype "html5"
       :html-checkbox-type unicode
       :html-html5-fancy t
       :html-postamble ,(oref pj :postamble)
