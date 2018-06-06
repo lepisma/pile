@@ -32,7 +32,7 @@
 
 (defun pile-tags-parse-buffer ()
   "Return a list of tags from the buffer"
-  (goto-char 1)
+  (goto-char (point-min))
   (if (search-forward "#+TAGS:" nil t)
       (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
         (-map #'s-trim (s-split "," text)))))
@@ -50,8 +50,7 @@
     (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
       (let ((tags (pile-tags-parse-buffer)))
         (pile--goto-top)
-        (insert (pile-tags-format-tags tags
-                                       (f-relative (oref pj :input-dir) fname)))))))
+        (insert (pile-tags-format-tags tags (f-relative (oref pj :input-dir) fname)))))))
 
 (provide 'pile-tags)
 

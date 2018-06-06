@@ -34,6 +34,7 @@
 (require 'f)
 (require 'pile-archive)
 (require 'pile-bc)
+(require 'pile-cids)
 (require 'pile-tags)
 (require 'pile-date)
 (require 'pile-dropcap)
@@ -56,9 +57,12 @@
   "List of managed pile projects"
   :group 'pile)
 
-(defvar pile-hooks '((wiki . (pile-bc-hook))
-                     (blog . (pile-dropcap-hook pile-tags-hook pile-date-hook))
-                     (static . ()))
+(defvar pile-hooks '((wiki . ((:pre . (pile-bc-hook pile-cids-add-all-hook))
+                              (:post . (pile-cids-clear-html-hook))))
+                     (blog . ((:pre . (pile-dropcap-hook pile-tags-hook pile-date-hook  pile-cids-add-all-hook))
+                              (:post . (pile-cids-clear-html-hook))))
+                     (static . ((:pre . ())
+                                (:post . ()))))
   "Hooks for each project type")
 
 (defclass pile-project ()

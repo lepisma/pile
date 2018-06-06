@@ -44,7 +44,7 @@
 
 (defun pile--goto-top ()
   "Move point to the top of file just after the headers"
-  (goto-char 0)
+  (goto-char (point-min))
   (if (search-forward "#+SETUPFILE:" nil t)
       (progn
         (while (pile--at-header?) (next-line))
@@ -73,14 +73,19 @@
 
 (defmacro with-pile-hooks (hooks &rest body)
   "Run body with pile related export hooks set"
-  `(condition-case err
-       (progn
-         (-each ,hooks (lambda (hook) (add-hook 'org-export-before-parsing-hook hook)))
-         ,@body
-         (-each ,hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook))))
-     (error (progn
-              (-each ,hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
-              (signal (car err) (cdr err))))))
+  `(let ((pre-hooks (cdr (assoc :pre ,hooks)))
+         (post-hooks (cdr (assoc :post ,hooks))))
+     (condition-case err
+         (progn
+           (-each pre-hooks (lambda (hook) (add-hook 'org-export-before-parsing-hook hook)))
+           (-each post-hooks (lambda (hook) (add-hook 'org-publish-after-publishing-hook hook)))
+           ,@body
+           (-each pre-hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
+           (-each post-hooks (lambda (hook) (remove-hook 'org-publish-after-publishing-hook hook))))
+       (error (progn
+                (-each pre-hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
+                (-each post-hooks (lambda (hook) (remove-hook 'org-publish-after-publishing-hook hook)))
+                (signal (car err) (cdr err)))))))
 
 (provide 'pile-utils)
 
