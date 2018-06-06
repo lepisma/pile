@@ -59,7 +59,8 @@
         (goto-char (point-min))
         (while (re-search-forward "<pre class=\"example\">[\n\r\s]*CUSTOM_ID:.*[\n\r\s]*</pre>" nil t)
           (replace-match ""))
-        (save-buffer))))
+        (save-buffer)
+        (kill-buffer))))
 
 (provide 'pile-cids)
 
