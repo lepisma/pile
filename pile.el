@@ -93,7 +93,7 @@
   `(,(format "pile-%s-static" (oref pj :name))
     :base-directory ,(oref pj :input-dir)
     :base-extension ".*"
-    :exclude ".*\.org\\|.*export\.setup\\|.*auto/.*\.el\\|.*\.tex\\|.*\.bib"
+    :exclude ".*\.org$\\|.*export\.setup$\\|.*auto/.*\.el$\\|.*\.tex$\\|.*\.bib$"
     :recursive t
     :publishing-directory ,(oref pj :output-dir)
     :publishing-function org-publish-attachment))
