@@ -42,7 +42,7 @@
   (concat "#+BEGIN_EXPORT html
 <div class='page-tags'>"
           (s-join " " (-map (lambda (tag) (format "<a href='%s#%s'>%s</a>"
-                                            (or archive-page "") tag tag)) tags))
+                                             (or archive-page "") tag tag)) tags))
           "</div>
 #+END_EXPORT"))
 
@@ -55,7 +55,7 @@
                 (and tag-opt (null (cdr tag-opt))))
       (let ((tags (pile-tags-parse-buffer)))
         (pile--goto-top)
-        (insert (pile-tags-format-tags tags (f-relative (oref pj :input-dir) fname)))))))
+        (insert (pile-tags-format-tags tags (f-relative (oref pj :input-dir) (f-parent fname))))))))
 
 (provide 'pile-tags)
 
