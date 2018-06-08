@@ -33,7 +33,7 @@
 (defun pile-tags-parse-buffer ()
   "Return a list of tags from the buffer"
   (goto-char (point-min))
-  (if (search-forward "#+TAGS:" nil t)
+  (if (re-search-forward "^#\\+TAGS:" nil t)
       (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
         (-map #'s-trim (s-split "," text)))))
 
