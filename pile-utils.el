@@ -39,8 +39,10 @@
 
 (defun pile--file-title (file)
   "Return title for an org file"
-  (second (s-split "TITLE: " (-find (-cut s-starts-with? "#+TITLE:" <>)
-                                    (s-split "\n" (f-read-text file))))))
+  (with-current-buffer (find-file-noselect file)
+    (goto-char (point-min))
+    (re-search-forward "^#\\+TITLE:")
+    (s-trim (buffer-substring-no-properties (point) (line-end-position)))))
 
 (defun pile--goto-top ()
   "Move point to the top of file just after the headers"
