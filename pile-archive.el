@@ -49,6 +49,15 @@
                   (tags . ,(pile-tags-parse-buffer))
                   (date . ,(pile-date-parse-date)))))) org-files)))
 
+(defun pile-archive-unique-tags (items)
+  "Parse unique tags from the page items"
+  (-sort #'string-lessp (-uniq (-mapcat (lambda (item) (cdr (assoc 'tags item))) items))))
+
+(defun pile-archive-tag-cloud ()
+  "Return a tag cloud"
+  (let ((items (pile-archive-parse)))
+    (pile-tags-format-tags (pile-archive-unique-tags items))))
+
 (defun pile-archive-format (page-alist)
   (let ((tags (cdr (assoc 'tags page-alist))))
     (format "
