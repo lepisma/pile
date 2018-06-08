@@ -41,7 +41,7 @@
   "Format tags and return html"
   (concat "#+BEGIN_EXPORT html
 <div class='page-tags'>"
-          (s-join "" (-map (lambda (tag) (format "<a href='%s#%s'>%s</a>"
+          (s-join " " (-map (lambda (tag) (format "<a href='%s#%s'>%s</a>"
                                             (or archive-page "") tag tag)) tags))
           "</div>
 #+END_EXPORT"))
