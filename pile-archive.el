@@ -46,8 +46,13 @@
               (with-current-buffer buffer
                 `((link . ,(concat "./" link))
                   (title . ,title)
+                  (draft . ,(cdr (assoc "draft" (pile-read-options))))
                   (tags . ,(pile-tags-parse-buffer))
                   (date . ,(pile-date-parse-date)))))) org-files)))
+
+(defun pile-archive-remove-drafts (items)
+  "Filter out draft pages"
+  (-remove (lambda (it) (cdr (assoc 'draft it))) items))
 
 (defun pile-archive-unique-tags (items)
   "Parse unique tags from the page items"
@@ -55,7 +60,7 @@
 
 (defun pile-archive-tag-cloud ()
   "Return a tag cloud"
-  (let ((items (pile-archive-parse)))
+  (let ((items (pile-archive-remove-drafts (pile-archive-parse))))
     (pile-tags-format-tags (pile-archive-unique-tags items))))
 
 (defun pile-archive-format (page-alist)
@@ -73,7 +78,7 @@
             (if tags (pile-tags-format-tags tags) ""))))
 
 (defun pile-archive ()
-  (let ((items (pile-archive-parse)))
+  (let ((items (pile-archive-remove-drafts (pile-archive-parse))))
     (s-join "\n" (-map #'pile-archive-format (-sort (lambda (a b)
                                                       (string-lessp (cdr (assoc 'date b))
                                                                     (cdr (assoc 'date a))))
