@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 's)
+(require 'pile-utils)
 
 (defun pile-cids-present-p ()
   "Check if a cid is already present"
@@ -34,7 +35,8 @@
 
 (defun pile-cids-add-all ()
   "Apply cid to all the headings in this buffer"
-  (org-map-entries (lambda () (unless (pile-cids-present-p) (pile-cids-add)))))
+  (let ((flat-cid (eq 'flat (cdr (assoc "cid" (pile-read-options))))))
+    (org-map-entries (lambda () (unless (pile-cids-present-p) (pile-cids-add flat-cid))))))
 
 (defun pile-cids-add-all-hook (_)
   (pile-cids-add-all))
@@ -47,9 +49,10 @@
   "Convert an outline to id"
   (s-replace-all '((" " . "-")) (downcase (s-join "/" outline))))
 
-(defun pile-cids-add ()
+(defun pile-cids-add (&optional flat)
   "Create/update a cid at point"
-  (let ((outline (append (org-get-outline-path) (list (substring-no-properties (org-get-heading))))))
+  (let* ((heading (substring-no-properties (org-get-heading)))
+         (outline (if flat (list heading) (append (org-get-outline-path) (list heading)))))
     (org-set-property "CUSTOM_ID" (pile-cids-outline-to-id outline))))
 
 (defun pile-cids-clear-html-hook (_ifile ofile)
