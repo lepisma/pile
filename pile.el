@@ -136,15 +136,17 @@
 
 (cl-defmethod pile-project-publish ((pj pile-project) &optional arg)
   "Publish the project"
-  (let ((hooks (cdr (assoc (oref pj :type) pile-hooks))))
-    (with-pile-hooks hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
+  (save-excursion
+    (let ((hooks (cdr (assoc (oref pj :type) pile-hooks))))
+      (with-pile-hooks hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg)))))
 
 (defun pile-publish-current-file (arg)
   "Publish only the current file"
   (interactive "P")
-  (let* ((pj (pile-get-project-from-file (buffer-file-name)))
-         (hooks (cdr (assoc (oref pj :type) pile-hooks))))
-    (with-pile-hooks hooks (org-publish-current-file arg))))
+  (save-excursion
+    (let* ((pj (pile-get-project-from-file (buffer-file-name)))
+           (hooks (cdr (assoc (oref pj :type) pile-hooks))))
+      (with-pile-hooks hooks (org-publish-current-file arg)))))
 
 ;;;###autoload
 (defun pile-publish (arg)
