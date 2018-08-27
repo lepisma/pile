@@ -58,9 +58,9 @@
   :group 'pile)
 
 (defvar pile-hooks '((wiki . ((:pre . (pile-bc-hook pile-cids-add-all-hook))
-                              (:post . (pile-cids-clear-html-hook))))
+                              (:post . (pile-cids-clear-html-hook pile-stringify-title-hook))))
                      (blog . ((:pre . (pile-dropcap-hook pile-tags-hook pile-date-hook pile-cids-add-all-hook))
-                              (:post . (pile-cids-clear-html-hook))))
+                              (:post . (pile-cids-clear-html-hook pile-stringify-title-hook))))
                      (static . ((:pre . ())
                                 (:post . ()))))
   "Hooks for each project type")

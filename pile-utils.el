@@ -76,6 +76,19 @@
         (let ((text (buffer-substring-no-properties (point) (line-end-position))))
           (pile--parse-option (s-trim text))))))
 
+(defun pile--clear-html (str)
+  "Clear html tags from STR."
+  (s-replace-regexp "<.*?>" "" str))
+
+(defun pile-stringify-title-hook (_ifile ofile)
+  "Remove html tags from generate page title"
+  (if (s-ends-with? ".html" ofile)
+      (with-current-buffer (find-file-noselect ofile)
+        (goto-char (point-min))
+        (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
+          (let ((old-title (match-string-no-properties 1)))
+            (replace-match (pile--clear-html old-title) nil nil nil 1))))))
+
 ;;;###autoload
 (defun pile-clear-cache ()
   "Clear org-publish-cache"
