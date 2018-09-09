@@ -47,7 +47,7 @@
 
 (defun pile-cids-outline-to-id (outline)
   "Convert an outline to id"
-  (s-replace-all '((" " . "-")) (downcase (s-join "/" outline))))
+  (format "sec-%s" (s-replace-all '((" " . "-")) (downcase (s-join "/" outline)))))
 
 (defun pile-cids-add (&optional flat)
   "Create/update a cid at point"
