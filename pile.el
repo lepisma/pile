@@ -34,6 +34,7 @@
 (require 'f)
 (require 'pile-archive)
 (require 'pile-bc)
+(require 'pile-blog)
 (require 'pile-cids)
 (require 'pile-tags)
 (require 'pile-date)

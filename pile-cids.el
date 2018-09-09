@@ -47,7 +47,7 @@
 
 (defun pile-cids-outline-to-id (outline counter)
   "Convert an OUTLINE to id and update the COUNTER."
-  (let ((id (format "sec-%s" (s-replace-all '((" " . "-")) (downcase (s-join "/" outline))))))
+  (let ((id (format "sec-%s" (pile--name-to-id (s-join "/" outline)))))
     (puthash id (+ 1 (gethash id counter 0)) counter)
     (let ((count (gethash id counter)))
       (if (= 1 count) id (format "%s-%s" id count)))))

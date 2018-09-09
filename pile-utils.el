@@ -29,6 +29,10 @@
 (require 'dash)
 (require 'dash-functional)
 (require 'f)
+(require 's)
+
+(defun pile--name-to-id (name)
+  (s-replace-all '((" " . "-")) (downcase (s-collapse-whitespace (s-trim name)))))
 
 (defun pile--at-header? ()
   "Return if at a header or empty line"
