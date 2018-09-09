@@ -35,25 +35,28 @@
 
 (defun pile-cids-add-all ()
   "Apply cid to all the headings in this buffer"
-  (let ((flat-cid (eq 'flat (cdr (assoc "cid" (pile-read-options))))))
-    (org-map-entries (lambda () (unless (pile-cids-present-p) (pile-cids-add flat-cid))))))
+  (let ((flat-cid (eq 'flat (cdr (assoc "cid" (pile-read-options)))))
+        (cid-counter (make-hash-table :test 'equal)))
+    (org-map-entries
+     (lambda ()
+       (unless (pile-cids-present-p)
+         (pile-cids-add cid-counter flat-cid))))))
 
 (defun pile-cids-add-all-hook (_)
   (pile-cids-add-all))
 
-(defun pile-cids-get-all ()
-  "Return all cids from the current buffer"
-  (org-map-entries (lambda () (org-entry-get (point) "CUSTOM_ID"))))
+(defun pile-cids-outline-to-id (outline counter)
+  "Convert an OUTLINE to id and update the COUNTER."
+  (let ((id (format "sec-%s" (s-replace-all '((" " . "-")) (downcase (s-join "/" outline))))))
+    (puthash id (+ 1 (gethash id counter 0)) counter)
+    (let ((count (gethash id counter)))
+      (if (= 1 count) id (format "%s-%s" id count)))))
 
-(defun pile-cids-outline-to-id (outline)
-  "Convert an outline to id"
-  (format "sec-%s" (s-replace-all '((" " . "-")) (downcase (s-join "/" outline)))))
-
-(defun pile-cids-add (&optional flat)
+(defun pile-cids-add (counter &optional flat)
   "Create/update a cid at point"
   (let* ((heading (substring-no-properties (org-get-heading)))
          (outline (if flat (list heading) (append (org-get-outline-path) (list heading)))))
-    (org-set-property "CUSTOM_ID" (pile-cids-outline-to-id outline))))
+    (org-set-property "CUSTOM_ID" (pile-cids-outline-to-id outline counter))))
 
 (defun pile-cids-clear-html-hook (_ifile ofile)
   "Clear CUSTOM_ID field from the generated html file"
