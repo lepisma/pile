@@ -32,6 +32,9 @@
 (require 'pile-tags)
 (require 'pile-date)
 
+;;;; TODO: Use (with-temp-buffer) and (insert-file-contents-liter...) with the
+;;;; byte bounds to optimize archive parsing.
+
 (defun pile-archive-parse ()
   "Parse the list of pages from the current root directory"
   (let ((org-files (-map (lambda (pr)
@@ -83,6 +86,22 @@
                                                       (string-lessp (cdr (assoc 'date b))
                                                                     (cdr (assoc 'date a))))
                                                     items)))))
+
+(defun pile-archive-regenerate-page (pj)
+  "Regenerate the index.org page for the blog type project."
+  (let ((index-file (f-join (oref pj :input-dir) "index.org")))
+    (if (f-exists-p index-file)
+        (with-current-buffer (find-file-noselect index-file)
+          (pile-publish-current-file t)))))
+
+;;;###autoload
+(defun pile-archive-regenerate ()
+  (interactive)
+  (helm :sources (helm-build-sync-source "Pile blog projects"
+                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
+                                       (cl-remove-if-not #'pile-blog-valid-project-p pile-projects))
+                   :action #'pile-archive-regenerate-page)))
+
 
 (provide 'pile-archive)
 
