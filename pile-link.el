@@ -31,32 +31,29 @@
 (require 'org)
 (require 'dash)
 (require 'pile-utils)
+(require 'pile-path)
 
 (org-add-link-type "pile" #'pile-link-follow #'pile-link-export)
 
-(defun pile-link--path (path root-dir)
-  (let ((pile-path (f-join root-dir path)))
-    (if (f-dir? pile-path)
-        (f-join path "index.org")
-      (format "%s.org" path))))
-
-(defun pile-link-parse-path (path)
-  (let* ((splits (s-split-up-to ":" path 1)))
-    (list (second splits)
-          (pile-get-project (car splits)))))
-
 (defun pile-link-follow (path)
   "Open the path in a buffer"
-  (-let [(p-path pj) (pile-link-parse-path path)]
-    (let ((root-dir (oref pj :input-dir)))
-      (find-file-existing (f-join root-dir (pile-link--path p-path root-dir))))))
+  (let* ((parse (pile-path-parse path))
+         (pj (alist-get 'project parse))
+         (internal-suffix (--if-let (alist-get 'internal-path parse) (format "::%s" it) "")))
+    (org-open-link-from-string
+     (format "file:%s%s" (f-join (oref pj :input-dir)
+                                 (pile-path-rel-to-org (alist-get 'rel-path parse) pj))
+             internal-suffix))))
 
 (defun pile-link-export (path desc backend)
   "Export fn for link"
-  (-let [(p-path pj) (pile-link-parse-path path)]
-    (if (eq backend 'html)
-        (format "<a class=\"pile-link\" href=\"/%s/%s\">%s</a>" (oref pj :base-url)
-                (f-swap-ext (pile-link--path p-path (oref pj :input-dir)) "html") desc))))
+  (if (eq backend 'html)
+      (let* ((parse (pile-path-parse path))
+             (pj (alist-get 'project parse))
+             (internal-suffix (--if-let (alist-get 'internal-path parse) (format "#sec-%s" (pile--name-to-id it)) "")))
+        (format "<a class=\"pile-link\" href=\"/%s/%s%s\">%s</a>" (oref pj :base-url)
+                (f-swap-ext (pile-path-rel-to-org (alist-get 'rel-path parse) pj) "html")
+                internal-suffix desc))))
 
 (provide 'pile-link)
 
