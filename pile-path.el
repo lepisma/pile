@@ -32,11 +32,12 @@
 (require 'pile-utils)
 
 (defun pile-path-rel-to-org (rel-path pj)
-  "Return rel path of the .org file in that project."
+  "Return rel path of the .org file in that project. Also works
+for static files if found."
   (let ((abs-path (f-join (oref pj :input-dir) rel-path)))
-    (if (f-dir-p abs-path)
-        (f-join rel-path "index.org")
-      (format "%s.org" rel-path))))
+    (cond ((f-dir-p abs-path) (f-join rel-path "index.org"))
+          ((f-exists-p abs-path) rel-path)
+          (t (format "%s.org" rel-path)))))
 
 (defun pile-path-parse (path)
   "Parse paths like wiki:this/that/ etc."
