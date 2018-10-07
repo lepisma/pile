@@ -29,6 +29,7 @@
 (require 'f)
 (require 'dash)
 (require 'helm)
+(require 'pile-blog)
 (require 'pile-utils)
 (require 'pile-tags)
 (require 'pile-date)
