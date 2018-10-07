@@ -28,30 +28,30 @@
 
 (require 'f)
 (require 'dash)
+(require 'helm)
 (require 'pile-utils)
 (require 'pile-tags)
 (require 'pile-date)
 
-;;;; TODO: Use (with-temp-buffer) and (insert-file-contents-liter...) with the
-;;;; byte bounds to optimize archive parsing.
-
 (defun pile-archive-parse ()
-  "Parse the list of pages from the current root directory"
+  "Parse the list of pages from the current root directory.
+TODO: This is a mess. Some times I am working with a fname arg,
+      other times with (current?) buffer."
   (let ((org-files (-map (lambda (pr)
                            (if (not (s-ends-with? ".org" pr))
                                (f-join pr "index.org")
                              pr))
                          (f-glob "*/*/*/*"))))
     (-map (lambda (fname)
-            (let ((buffer (find-file-noselect fname))
-                  (link (f-relative fname default-directory))
+            (let ((link (f-relative fname default-directory))
                   (title (pile--file-title fname)))
-              (with-current-buffer buffer
+              (with-temp-buffer
+                (insert-file-contents-literally fname nil nil 1000)
                 `((link . ,(concat "./" link))
                   (title . ,title)
                   (draft . ,(cdr (assoc "draft" (pile-read-options))))
                   (tags . ,(pile-tags-parse-buffer))
-                  (date . ,(pile-date-parse-date)))))) org-files)))
+                  (date . ,(pile-date-parse-date fname)))))) org-files)))
 
 (defun pile-archive-remove-drafts (items)
   "Filter out draft pages"

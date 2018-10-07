@@ -30,9 +30,9 @@
 (require 's)
 (require 'pile-utils)
 
-(defun pile-date-parse-date ()
+(defun pile-date-parse-date (&optional file-path)
   "Get date from the buffer path"
-  (let* ((path (buffer-file-name))
+  (let* ((path (or file-path (buffer-file-name)))
          (date-path (if (string-equal "index.org" (f-filename path))
                         (f-parent (f-parent path))
                       (f-parent path))))
