@@ -26,16 +26,28 @@
 
 ;;; Code:
 
+(require 'dash)
+(require 'pile-path)
 (require 'w)
 
 (defcustom pile-serve-dir nil
   "Directory to serve by default"
   :group 'pile)
 
+(defun pile-serve-relative-url (pile-path)
+  (let* ((parse (pile-path-parse pile-path))
+         (pj (alist-get 'project parse)))
+    (format "/%s/%s%s"
+            (oref pj :base-url)
+            (f-swap-ext (pile-path-rel-to-org (alist-get 'rel-path parse) pj) "html")
+            (--if-let (alist-get 'internal-path parse) (concat "#" it) ""))))
+
 (defun pile-serve ()
   "Start server for pile"
   (interactive)
-  (w-start pile-serve-dir))
+  (let* ((fname (buffer-file-name))
+         (pile-path (if fname (pile-path-abs-to-pile fname))))
+    (w-start pile-serve-dir (if pile-path (pile-serve-relative-url pile-path)))))
 
 (defun pile-serve-stop ()
   "Stop pile server"
