@@ -31,6 +31,24 @@
 (require 'dash)
 (require 'pile-utils)
 
+;; Path types
+;; ----------
+;; abs-path : Absolute system path for the file.
+;;            Example /home/lepisma/something.type
+;; rel-path : Relative path of the file. Needs a project to get the root-dir.
+;;            For example 2018/02/02/main.org
+;; pile-path: Pile formatted path <project-name>:<rel-path>
+;;            For example wiki:emacs/til
+
+(defun pile-path-abs-project (abs-path)
+  "Return project for the abs-path."
+  (-find (lambda (pj) (f-ancestor-of? (oref pj :input-dir) abs-path)) pile-projects))
+
+(defun pile-path-abs-to-pile (abs-path)
+  "Return pile-path from the abs-path."
+  (let ((pj (pile-path-abs-project abs-path)))
+    (if pj (format "%s:%s" (oref pj :name) (f-relative abs-path (oref pj :input-dir))))))
+
 (defun pile-path-rel-to-org (rel-path pj)
   "Return rel path of the .org file in that project. Also works
 for static files if found."
@@ -39,17 +57,17 @@ for static files if found."
           ((f-exists-p abs-path) rel-path)
           (t (format "%s.org" rel-path)))))
 
-(defun pile-path-parse (path)
+(defun pile-path-parse (pile-path)
   "Parse paths like wiki:this/that/ etc."
-  (-let [(pname rest-path) (s-split-up-to ":" path 1)]
+  (-let [(pname rest-path) (s-split-up-to ":" pile-path 1)]
     (let ((splits (s-split-up-to "::" rest-path 1)))
       `((project . ,(pile-get-project pname))
         (rel-path . ,(car splits))
         (internal-path . ,(second splits))))))
 
-(defun pile-path-abs (path)
+(defun pile-path-abs (pile-path)
   "Ignoring the internal link"
-  (let* ((parse (pile-path-parse path))
+  (let* ((parse (pile-path-parse pile-path))
          (pj (alist-get 'project parse)))
     (f-join (oref pj :input-dir) (pile-path-rel-to-org (alist-get 'rel-path parse) pj))))
 
