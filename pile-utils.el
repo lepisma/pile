@@ -44,7 +44,7 @@
 (defun pile--file-title (file)
   "Return title for an org file"
   (with-temp-buffer
-    (insert-file-contents-literally file nil nil 1000)
+    (insert-file-contents file nil nil 1000)
     (goto-char (point-min))
     (re-search-forward "^#\\+TITLE:")
     (s-trim (buffer-substring-no-properties (point) (line-end-position)))))
