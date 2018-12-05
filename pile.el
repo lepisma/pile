@@ -71,6 +71,9 @@
   ((name :initarg :name
          :type string
          :documentation "Name for the project")
+   (root-url :initarg :root-url
+             :type string
+             :documentation "Url for the deployed site")
    (base-url :initarg :base-url
              :type string
              :documentation "Url with respect to / at the host")
