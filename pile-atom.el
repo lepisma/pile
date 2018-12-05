@@ -54,8 +54,9 @@
 (defun pile-atom-parse-item (pj item)
   "Create an ht for the ITEM generated from pile-archive."
   (let* ((link (alist-get 'link item))
+         (base-url-text (if (string-equal (oref pj :base-url) "") "" (file-name-as-directory (oref pj :base-url))))
          (new-link (concat (file-name-as-directory (oref pj :root-url))
-                           (file-name-as-directory (oref pj :base-url))
+                           base-url-text
                            (s-chop-prefix "./" (s-replace-regexp "\\.org$" ".html" link)))))
     (setf (alist-get 'link item) new-link)
     (let ((item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) item)))
