@@ -4,7 +4,7 @@
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
 ;; Version: 0.1.4
-;; Package-Requires: ((emacs "25") (dash "2.13.0") (dash-functional "2.13.0") (f "0.20.0") (s "1.12.0"))
+;; Package-Requires: ((emacs "25") (dash "2.13.0") (dash-functional "2.13.0") (f "0.20.0") (s "1.12.0") (mustache "0.24") (ht "2.2"))
 ;; URL: https://github.com/lepisma/pile
 
 ;;; Commentary:
@@ -44,6 +44,7 @@
 (require 'pile-path)
 (require 'pile-link)
 (require 'pile-serve)
+(require 'pile-atom)
 (require 'pile-sitemap)
 (require 'org)
 (require 'ox-html)
