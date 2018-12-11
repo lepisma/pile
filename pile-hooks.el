@@ -59,27 +59,34 @@
   (pile-when-type '(blog)
     (pile-tags-add)))
 
-(defun pile-hooks-post-generate-atom (ifile _ofile)
+(defun pile-hooks-post-generate-atom (ifile ofile)
   "Regenerate atom files for the current project."
   (let ((pj (pile-get-project-from-file ifile)))
-    (pile-atom-regenerate-page pj)))
+    (when (and (member (oref pj :type) '(blog))
+               (s-ends-with-p ".html" ofile))
+      (pile-atom-regenerate-page pj))))
 
 (defun pile-hooks-post-clear-cids (ifile ofile)
   "Remove CUSTOM_ID related divs from the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (and (member (oref pj :type) '(blog wiki))
                (s-ends-with-p ".html" ofile))
-      (pile-cids-clear-html))))
+      (with-current-buffer (find-file-noselect ofile)
+        (pile-cids-clear-html)
+        (if (buffer-modified-p) (save-buffer))
+        (kill-buffer)))))
 
 (defun pile-hooks-post-stringify-title (ifile ofile)
   "Make the title plain text in the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (and (member (oref pj :type) '(blog wiki))
                (s-ends-with-p ".html" ofile))
-      (goto-char (point-min))
-      (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
-        (let ((old-title (match-string-no-properties 1)))
-          (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1))))))
+      (with-current-buffer (find-file-noselect ofile)
+        (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
+          (let ((old-title (match-string-no-properties 1)))
+            (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
+        (if (buffer-modified-p) (save-buffer))
+        (kill-buffer)))))
 
 (provide 'pile-hooks)
 

@@ -62,8 +62,8 @@
   :group 'pile)
 
 (defcustom pile-pre-publish-hook nil
-  "Hook for pre publish. Functions take no arguments and run in the\
-too-be-published buffer."
+  "Hook for pre publish. Functions take no arguments and run in the
+to-be-published buffer."
   :type 'hook
   :group 'pile)
 

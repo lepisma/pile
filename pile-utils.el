@@ -31,9 +31,6 @@
 (require 'f)
 (require 's)
 
-(defvar pile-pre-hook-counter 0
-  "Counter for pre hook id assignment.")
-
 (defun pile--name-to-id (name)
   (s-replace-all '((" " . "-")) (downcase (s-collapse-whitespace (s-trim name)))))
 
@@ -95,31 +92,31 @@
        (-filter #'f-exists?)
        (-map #'f-delete))))
 
-(defmacro pile-make-pre-hook (hook-fn)
-  "Make org-export style hook from pile hook and return the symbol."
-  (let ((fn-name (intern (format "pile-hook-fn-%s" pile-pre-hook-counter))))
-    (incf pile-pre-hook-counter)
+(defmacro pile-make-pre-hooks ()
+  "Make org-export style hooks from pile hooks and return the symbol list."
+  (let ((fn-names (loop for i from 1 to (length pile-pre-publish-hook) collect (gensym "pile-hook-fn"))))
     `(progn
-       (defun ,fn-name (_export-backend)
-         (funcall ,hook-fn))
-       ',fn-name)))
+       ,@(loop for fn in pile-pre-publish-hook
+               for fn-name in fn-names
+               collect `(defun ,fn-name (_export-backend)
+                          (funcall ',fn)))
+       ',fn-names)))
 
 (defmacro with-pile-hooks (&rest body)
   "Run body with pile related export hooks set."
-  (let* ((pre-hooks (cl-loop for fn in pile-pre-publish-hook collect (pile-make-pre-hook fn)))
-         (add-forms `((dolist (hook ',pre-hooks)
+  (let* ((add-forms `((dolist (hook pre-hooks)
                         (add-hook 'org-export-before-parsing-hook hook))
                       (dolist (hook pile-post-publish-hook)
                         (add-hook 'org-publish-after-publishing-hook hook))))
-         (remove-forms `((dolist (hook ',pre-hooks)
+         (remove-forms `((dolist (hook pre-hooks)
                            (remove-hook 'org-export-before-parsing-hook hook)
-                           (unintern hook nil)
-                           (decf pile-pre-hook-counter))
+                           (unintern hook nil))
                          (dolist (hook pile-post-publish-hook)
                            (remove-hook 'org-publish-after-publishing-hook hook)))))
-    `(condition-case err
-         (progn ,@add-forms ,@body ,@remove-forms)
-       (error (progn ,@remove-forms (signal (car err) (cdr err)))))))
+    `(let ((pre-hooks (pile-make-pre-hooks)))
+       (condition-case err
+           (progn ,@add-forms ,@body ,@remove-forms)
+         (error (progn ,@remove-forms (signal (car err) (cdr err))))))))
 
 (defmacro pile-when-type (project-types &rest body)
   "Run the body form when the current buffer type is from one of the given project types."
