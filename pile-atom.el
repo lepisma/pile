@@ -76,11 +76,12 @@
                            ("entry" (mapcar (-cut pile-atom-parse-item pj <>) items)))))))
 
 (defun pile-atom-regenerate-page (pj)
-  (let ((text (pile-atom-generate pj))
-        (feed-file (f-join (oref pj :input-dir) "atom.xml")))
-    (if text
-        (f-write-text text 'utf-8 feed-file)
-      (message "Feed not generated."))))
+  "Regenerate atom.xml file for project PJ. Also copy the file in deploy
+directory."
+  (let ((text (pile-atom-generate pj)))
+    (when text
+      (f-write-text text 'utf-8 (f-join (oref pj :input-dir) "atom.xml"))
+      (f-write-text text 'utf-8 (f-join (oref pj :output-dir) "atom.xml")))))
 
 (defun pile-atom-regenerate ()
   (interactive)
