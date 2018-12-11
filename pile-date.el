@@ -38,7 +38,7 @@
                       (f-parent path))))
     (s-replace "/" "-" (substring date-path -10))))
 
-(defun pile-date-hook (_)
+(defun pile-date-add ()
   "Function to insert date information in the exported file"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname)))

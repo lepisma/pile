@@ -42,9 +42,6 @@
        (unless (pile-cids-present-p)
          (pile-cids-add cid-counter flat-cid))))))
 
-(defun pile-cids-add-all-hook (_)
-  (pile-cids-add-all))
-
 (defun pile-cids-outline-to-id (outline counter)
   "Convert an OUTLINE to id and update the COUNTER."
   (let ((id (format "sec-%s" (pile--name-to-id (s-join "/" outline)))))
@@ -58,19 +55,15 @@
          (outline (if flat (list heading) (append (org-get-outline-path) (list heading)))))
     (org-set-property "CUSTOM_ID" (pile-cids-outline-to-id outline counter))))
 
-(defun pile-cids-clear-html-hook (_ifile ofile)
-  "Clear CUSTOM_ID field from the generated html file"
-  (if (s-ends-with? ".html" ofile)
-      (with-current-buffer (find-file-noselect ofile)
-        (goto-char (point-min))
-        (while (re-search-forward "<pre class=\"example\">\\(.*\n\\)*?custom_id:.*$" nil t)
-          (delete-line)
-          (delete-char 1))
-        (goto-char (point-min))
-        (while (re-search-forward "<pre class=\"example\">\n*</pre>" nil t)
-          (replace-match ""))
-        (save-buffer)
-        (kill-buffer))))
+(defun pile-cids-clear-html ()
+  "Clear CUSTOM_ID field from the generated html file (current buffer)."
+  (goto-char (point-min))
+  (while (re-search-forward "<pre class=\"example\">\\(.*\n\\)*?custom_id:.*$" nil t)
+    (delete-line)
+    (delete-char 1))
+  (goto-char (point-min))
+  (while (re-search-forward "<pre class=\"example\">\n*</pre>" nil t)
+    (replace-match "")))
 
 (provide 'pile-cids)
 

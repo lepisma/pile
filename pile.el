@@ -46,6 +46,7 @@
 (require 'pile-serve)
 (require 'pile-atom)
 (require 'pile-sitemap)
+(require 'pile-hooks)
 (require 'org)
 (require 'ox-html)
 (require 'ox-publish)
@@ -60,13 +61,19 @@
   "List of managed pile projects"
   :group 'pile)
 
-(defvar pile-hooks '((wiki . ((:pre . (pile-bc-hook pile-cids-add-all-hook))
-                              (:post . (pile-cids-clear-html-hook pile-stringify-title-hook))))
-                     (blog . ((:pre . (pile-dropcap-hook pile-tags-hook pile-date-hook pile-cids-add-all-hook))
-                              (:post . (pile-cids-clear-html-hook pile-stringify-title-hook))))
-                     (static . ((:pre . ())
-                                (:post . ()))))
-  "Hooks for each project type")
+(defcustom pile-pre-publish-hook nil
+  "Hook for pre publish. Functions take no arguments and run in the\
+too-be-published buffer."
+  :type 'hook
+  :group 'pile)
+
+(defcustom pile-post-publish-hook nil
+  "Hook for post publish. Functions take the following arguments:
+1. Input file path
+2. Output file path
+These functions are directly appended to org-publish-after-publishing-hook."
+  :type 'hook
+  :group 'pile)
 
 (defclass pile-project ()
   ((name :initarg :name
@@ -143,14 +150,13 @@
 (cl-defmethod pile-project-publish ((pj pile-project) &optional arg)
   "Publish the project"
   (save-excursion
-    (with-pile-hooks (oref pj :type) (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
+    (with-pile-hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
 
 (defun pile-publish-current-file (arg)
   "Publish only the current file"
   (interactive "P")
   (save-excursion
-    (let* ((pj (pile-get-project-from-file (buffer-file-name))))
-      (with-pile-hooks (oref pj :type) (org-publish-current-file arg)))))
+    (with-pile-hooks (org-publish-current-file arg))))
 
 ;;;###autoload
 (defun pile-publish (arg)

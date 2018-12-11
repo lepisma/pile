@@ -31,7 +31,7 @@
 (require 'pile-utils)
 
 (defun pile-tags-parse-buffer ()
-  "Return a list of tags from the buffer"
+  "Return a list of tags from the current buffer."
   (goto-char (point-min))
   (if (re-search-forward "^#\\+TAGS:" nil t)
       (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
@@ -46,7 +46,7 @@
           "</div>
 #+END_EXPORT"))
 
-(defun pile-tags-hook (_)
+(defun pile-tags-add ()
   "Function to insert tag list in the exported file"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))

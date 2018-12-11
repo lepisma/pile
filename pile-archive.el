@@ -26,13 +26,13 @@
 
 ;;; Code:
 
-(require 'f)
 (require 'dash)
+(require 'f)
 (require 'helm)
 (require 'pile-blog)
-(require 'pile-utils)
-(require 'pile-tags)
 (require 'pile-date)
+(require 'pile-tags)
+(require 'pile-utils)
 
 (defun pile-archive-parse ()
   "Parse the list of pages from the current root directory.

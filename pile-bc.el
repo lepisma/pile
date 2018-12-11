@@ -27,8 +27,8 @@
 ;;; Code:
 
 (require 'f)
-(require 's)
 (require 'pile-utils)
+(require 's)
 
 (defun pile-bc--parents (rel-path)
   "Break path into roots"
@@ -72,8 +72,8 @@
             (if (zerop (length parents)) "" (format "%s /" (pile-bc--linkify-parents parents)))
             (pile-bc--page-title rel-path))))
 
-(defun pile-bc-hook (_)
-  "Function to insert breadcrumbs in the exported file"
+(defun pile-bc-add ()
+  "Function to insert breadcrumbs in the current file."
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))
          (rel-path (s-chop-suffix ".org" (f-relative fname (oref pj :input-dir)))))

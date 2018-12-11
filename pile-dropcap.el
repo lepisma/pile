@@ -48,7 +48,7 @@
          (t (setq move nil)))))
     (goto-char (line-beginning-position))))
 
-(defun pile-dropcap-hook (_)
+(defun pile-dropcap-add ()
   "Function to add dropcap"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))

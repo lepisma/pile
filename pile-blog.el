@@ -26,11 +26,11 @@
 
 ;;; Code:
 
-(require 'helm)
-(require 'f)
-(require 's)
 (require 'cl-lib)
+(require 'f)
+(require 'helm)
 (require 'pile-utils)
+(require 's)
 
 
 (defun pile-blog--create-post (name pj)

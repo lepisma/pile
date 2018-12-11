@@ -31,6 +31,9 @@
 (require 'f)
 (require 's)
 
+(defvar pile-pre-hook-counter 0
+  "Counter for pre hook id assignment.")
+
 (defun pile--name-to-id (name)
   (s-replace-all '((" " . "-")) (downcase (s-collapse-whitespace (s-trim name)))))
 
@@ -81,19 +84,6 @@
         (let ((text (buffer-substring-no-properties (point) (line-end-position))))
           (pile--parse-option (s-trim text))))))
 
-(defun pile--clear-html (str)
-  "Clear html tags from STR."
-  (s-replace-regexp "<.*?>" "" str))
-
-(defun pile-stringify-title-hook (_ifile ofile)
-  "Remove html tags from generate page title"
-  (if (s-ends-with? ".html" ofile)
-      (with-current-buffer (find-file-noselect ofile)
-        (goto-char (point-min))
-        (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
-          (let ((old-title (match-string-no-properties 1)))
-            (replace-match (pile--clear-html old-title) nil nil nil 1))))))
-
 ;;;###autoload
 (defun pile-clear-cache ()
   "Clear org-publish-cache"
@@ -105,22 +95,38 @@
        (-filter #'f-exists?)
        (-map #'f-delete))))
 
-(defmacro with-pile-hooks (project-type &rest body)
-  "Run body with pile related export hooks set"
-  (let ((hooks (cdr (assoc project-type pile-hooks))))
-    `(let ((pre-hooks (cdr (assoc :pre ,hooks)))
-           (post-hooks (cdr (assoc :post ,hooks))))
-       (condition-case err
-           (progn
-             (-each pre-hooks (lambda (hook) (add-hook 'org-export-before-parsing-hook hook)))
-             (-each post-hooks (lambda (hook) (add-hook 'org-publish-after-publishing-hook hook)))
-             ,@body
-             (-each pre-hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
-             (-each post-hooks (lambda (hook) (remove-hook 'org-publish-after-publishing-hook hook))))
-         (error (progn
-                  (-each pre-hooks (lambda (hook) (remove-hook 'org-export-before-parsing-hook hook)))
-                  (-each post-hooks (lambda (hook) (remove-hook 'org-publish-after-publishing-hook hook)))
-                  (signal (car err) (cdr err))))))))
+(defmacro pile-make-pre-hook (hook-fn)
+  "Make org-export style hook from pile hook and return the symbol."
+  (let ((fn-name (intern (format "pile-hook-fn-%s" pile-pre-hook-counter))))
+    (incf pile-pre-hook-counter)
+    `(progn
+       (defun ,fn-name (_export-backend)
+         (funcall ,hook-fn))
+       ',fn-name)))
+
+(defmacro with-pile-hooks (&rest body)
+  "Run body with pile related export hooks set."
+  (let* ((pre-hooks (cl-loop for fn in pile-pre-publish-hook collect (pile-make-pre-hook fn)))
+         (add-forms `((dolist (hook ',pre-hooks)
+                        (add-hook 'org-export-before-parsing-hook hook))
+                      (dolist (hook pile-post-publish-hook)
+                        (add-hook 'org-publish-after-publishing-hook hook))))
+         (remove-forms `((dolist (hook ',pre-hooks)
+                           (remove-hook 'org-export-before-parsing-hook hook)
+                           (unintern hook nil)
+                           (decf pile-pre-hook-counter))
+                         (dolist (hook pile-post-publish-hook)
+                           (remove-hook 'org-publish-after-publishing-hook hook)))))
+    `(condition-case err
+         (progn ,@add-forms ,@body ,@remove-forms)
+       (error (progn ,@remove-forms (signal (car err) (cdr err)))))))
+
+(defmacro pile-when-type (project-types &rest body)
+  "Run the body form when the current buffer type is from one of the given project types."
+  (declare (indent defun))
+  `(let ((pj (pile-get-project-from-file (buffer-file-name))))
+     (when (member (oref pj :type) ,project-types)
+       ,@body)))
 
 (provide 'pile-utils)
 
