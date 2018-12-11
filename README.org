@@ -1,3 +1,14 @@
 #+TITLE: pile
 
-Source code for my [[https://lepisma.github.io/][web site]] setup.
+Source code for my [[https://lepisma.github.io/][web site]] setup. ~pile~ wraps around ~org-publish~ and adds a few
+functions to improve the experience of generating static htmls.
+
+The package lives on a /commit-on-need/ basis so might not be in good shape at any
+point in time. The basic item here is a ~pile-project~ which can be of the /wiki/x
+type (focused on having updatable set of pages, like in a regular wiki) or a
+/blog/ type (a stream of posts, dated and tagged). These projects then define the
+kind of embellishments the pages get using a bunch of hooks and/or org level
+config using the ~org-export~ and ~org-publish~ infrastructure.
+
+Overall it's sometimes annoying and slow but that's mostly okay since I can plug
+in other speedy stuff if needed.
