@@ -92,7 +92,7 @@
        (-filter #'f-exists?)
        (-map #'f-delete))))
 
-(defmacro pile-make-pre-hooks ()
+(defun pile-make-pre-hooks-form ()
   "Make org-export style hooks from pile hooks and return the symbol list."
   (let ((fn-names (loop for i from 1 to (length pile-pre-publish-hook) collect (gensym "pile-hook-fn"))))
     `(progn
@@ -113,7 +113,7 @@
                            (unintern hook nil))
                          (dolist (hook pile-post-publish-hook)
                            (remove-hook 'org-publish-after-publishing-hook hook)))))
-    `(let ((pre-hooks (pile-make-pre-hooks)))
+    `(let ((pre-hooks (eval (pile-make-pre-hooks-form))))
        (condition-case err
            (progn ,@add-forms ,@body ,@remove-forms)
          (error (progn ,@remove-forms (signal (car err) (cdr err))))))))
