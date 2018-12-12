@@ -152,6 +152,7 @@ These functions are directly appended to org-publish-after-publishing-hook."
   (save-excursion
     (with-pile-hooks (org-publish-project (format "pile-%s" (oref pj :name)) arg))))
 
+;; TODO: This needs to be re-evaluated after setting the hooks
 (defun pile-publish-current-file (arg)
   "Publish only the current file"
   (interactive "P")
