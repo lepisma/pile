@@ -10,5 +10,4 @@ type (focused on having updatable set of pages, like in a regular wiki) or a
 kind of embellishments the pages get using a bunch of hooks and/or org level
 config using the ~org-export~ and ~org-publish~ infrastructure.
 
-Overall it's sometimes annoying and slow but that's mostly okay since I can plug
-in other speedy stuff if needed.
+Overall this setup is sometimes annoying and slow but works mostly okay for me.
