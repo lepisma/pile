@@ -58,12 +58,11 @@
 (defun pile-cids-clear-html ()
   "Clear CUSTOM_ID field from the generated html file (current buffer)."
   (goto-char (point-min))
-  (while (re-search-forward "<pre class=\"example\">\\(.*\n\\)*?custom_id:.*$" nil t)
-    (delete-line)
-    (delete-char 1))
-  (goto-char (point-min))
-  (while (re-search-forward "<pre class=\"example\">\n*</pre>" nil t)
-    (replace-match "")))
+  (while (re-search-forward "\\(<pre class=\"example\">\n*custom_id:.*\n</pre>\\)\\|<pre class=\"example\">\\(.*\n\\)+?\\(custom_id:.*\n\\)</pre>" nil t)
+    ;; Matches are mutually exhaustive
+    (if (match-beginning 1)
+        (replace-match "" nil nil nil 1)
+      (replace-match "" nil nil nil 3))))
 
 (provide 'pile-cids)
 
