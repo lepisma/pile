@@ -88,6 +88,13 @@
         (if (buffer-modified-p) (save-buffer))
         (kill-buffer)))))
 
+(defun pile-hooks-post-generate-archive (ifile ofile)
+  "Regenerate the archive (index page) for the project."
+  (let ((pj (pile-get-project-from-file ifile)))
+    (when (and (member (oref pj :type) '(blog))
+               (s-ends-with-p ".html" ofile))
+      (pile-archive-regenerate-page pj))))
+
 (provide 'pile-hooks)
 
 ;;; pile-hooks.el ends here
