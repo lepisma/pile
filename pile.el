@@ -44,6 +44,7 @@
 (require 'pile-path)
 (require 'pile-link)
 (require 'pile-serve)
+(require 'pile-ref)
 (require 'pile-atom)
 (require 'pile-sitemap)
 (require 'pile-hooks)
@@ -169,14 +170,9 @@ These functions are directly appended to org-publish-after-publishing-hook."
 ;;;###autoload
 (defun pile-setup ()
   "Setup for pile"
-  (-map (lambda (pj) (setq org-publish-project-alist (append org-publish-project-alist (pile-project-config pj)))) pile-projects)
-  (setq org-html-htmlize-output-type 'css
-        org-ref-bibliography-entry-format
-        '(("article" . "%a. %y. \"%t.\" <i>%j</i>, %v(%n), %p. <a class=\"bib-link\" href=\"%U\">link</a>. <a class=\"bib-link\" href=\"http://dx.doi.org/%D\">doi</a>.")
-          ("book" . "%a. %y. <i>%t</i>. %u.")
-          ("techreport" . "%a. %y. \"%t\", %i, %u.")
-          ("proceedings" . "%e. %y. \"%t\" in %S, %u.")
-          ("inproceedings" . "%a. %y. \"%t\", %p, in %b, edited by %e, %u"))))
+  (let ((project-configs (mapcar #'pile-project-config pile-projects)))
+    (setq org-publish-project-alist (append org-publish-project-alist project-configs)))
+  (pile-ref-setup))
 
 (provide 'pile)
 
