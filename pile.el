@@ -171,7 +171,7 @@ These functions are directly appended to org-publish-after-publishing-hook."
 (defun pile-setup ()
   "Setup for pile"
   (let ((project-configs (mapcar #'pile-project-config pile-projects)))
-    (setq org-publish-project-alist (append org-publish-project-alist project-configs)))
+    (setq org-publish-project-alist (apply #'append org-publish-project-alist project-configs)))
   (pile-ref-setup))
 
 (provide 'pile)
