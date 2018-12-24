@@ -92,7 +92,8 @@
   "Regenerate the archive (index page) for the project."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (and (member (oref pj :type) '(blog))
-               (s-ends-with-p ".html" ofile))
+               (s-ends-with-p ".html" ofile)
+               (not (pile-archive-page-p ifile)))
       (pile-archive-regenerate-page pj))))
 
 (provide 'pile-hooks)

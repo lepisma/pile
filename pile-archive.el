@@ -95,6 +95,11 @@ TODO: This is a mess. Some times I am working with a fname arg,
         (with-current-buffer (find-file-noselect index-file)
           (pile-publish-current-file t)))))
 
+(defun pile-archive-page-p (file-path)
+  "Tell if the page is 'the' archive page for its project."
+  (let ((pj (pile-get-project-from-file file-path)))
+    (string= file-path (f-join (oref pj :input-dir) "index.org"))))
+
 ;;;###autoload
 (defun pile-archive-regenerate ()
   (interactive)
