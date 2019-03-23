@@ -30,13 +30,16 @@
 (require 'org)
 (require 'org-ref)
 (require 'ox-html)
+(require 'pile-utils)
 
 (defun pile-ref-update-bib ()
   (interactive)
   "Update the bib file for the current buffer."
-  (let ((bib-file (f-join default-directory "references.bib")))
-    (delete-file bib-file)
-    (org-ref-extract-bibtex-to-file bib-file)))
+  (if (pile-get-project-from-file (buffer-file-name))
+      (let ((bib-file (f-join default-directory "references.bib")))
+        (delete-file bib-file)
+        (org-ref-extract-bibtex-to-file bib-file))
+    (message "Buffer not part of any pile project")))
 
 (defun pile-ref-setup ()
   (setq org-html-htmlize-output-type 'css
