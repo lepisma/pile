@@ -50,7 +50,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
                 (insert-file-contents-literally fname nil nil 1000)
                 `((link . ,(concat "./" link))
                   (title . ,title)
-                  (draft . ,(cdr (assoc "draft" (pile-read-options))))
+                  (draft . ,(cdr (assoc 'draft (pile-read-options))))
                   (tags . ,(pile-tags-parse-buffer))
                   (date . ,(pile-date-parse-date fname)))))) org-files)))
 

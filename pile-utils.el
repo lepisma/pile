@@ -70,7 +70,7 @@
 (defun pile--parse-option (text)
   (-map (lambda (kv)
           (-let [(k . v) (s-split ":" kv)]
-            (cons k (read v))))
+            (cons (intern k) (read v))))
         (s-split " " text)))
 
 (defun pile-read-options ()

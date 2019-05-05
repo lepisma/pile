@@ -50,7 +50,7 @@
   "Function to insert tag list in the exported file"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))
-         (tag-opt (assoc "tags" (pile-read-options))))
+         (tag-opt (assoc 'tags (pile-read-options))))
     (unless (or (string-equal fname (f-join (oref pj :input-dir) "index.org"))
                 (and tag-opt (null (cdr tag-opt))))
       (let ((tags (pile-tags-parse-buffer)))

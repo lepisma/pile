@@ -35,7 +35,7 @@
 
 (defun pile-cids-add-all ()
   "Apply cid to all the headings in this buffer"
-  (let ((flat-cid (eq 'flat (cdr (assoc "cid" (pile-read-options)))))
+  (let ((flat-cid (eq 'flat (cdr (assoc 'cid (pile-read-options)))))
         (cid-counter (make-hash-table :test 'equal)))
     (org-map-entries
      (lambda ()

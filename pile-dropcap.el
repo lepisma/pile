@@ -52,7 +52,7 @@
   "Function to add dropcap"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))
-         (dc-opt (assoc "dropcap" (pile-read-options))))
+         (dc-opt (assoc 'dropcap (pile-read-options))))
     (unless (or (string-equal fname (f-join (oref pj :input-dir) "index.org"))
                 (and dc-opt (null (cdr dc-opt))))
       (pile-dropcap-goto-first-char)
