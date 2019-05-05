@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'dash-functional)
 (require 'f)
 (require 'helm)
 (require 'ht)
