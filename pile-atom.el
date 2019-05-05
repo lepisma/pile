@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'dash)
 (require 'f)
 (require 'helm)
 (require 'ht)
@@ -67,7 +68,9 @@
   "Generate string representation of the feed for the project PJ."
   (when (eq (oref pj :type) 'blog)
     (let* ((default-directory (oref pj :input-dir))
-           (items (sort (pile-archive-parse) (lambda (a b) (string-greaterp (alist-get 'date a) (alist-get 'date b))))))
+           (items (->> (pile-archive-parse)
+                     (-remove #'pile-archive-draft-p)
+                     (-sort (lambda (a b) (string-greaterp (alist-get 'date a) (alist-get 'date b)))))))
       (mustache-render pile-atom-template
                        (ht ("root-author" (user-full-name))
                            ("root-title" (oref pj :name))
@@ -88,7 +91,7 @@ directory."
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (cl-remove-if-not #'pile-blog-valid-project-p pile-projects))
+                                       (-filter #'pile-blog-valid-project-p pile-projects))
                    :action #'pile-atom-regenerate-page)))
 
 (provide 'pile-atom)

@@ -54,9 +54,8 @@ TODO: This is a mess. Some times I am working with a fname arg,
                   (tags . ,(pile-tags-parse-buffer))
                   (date . ,(pile-date-parse-date fname)))))) org-files)))
 
-(defun pile-archive-remove-drafts (items)
-  "Filter out draft pages"
-  (-remove (lambda (it) (cdr (assoc 'draft it))) items))
+(defun pile-archive-draft-p (item)
+  (alist-get 'draft item))
 
 (defun pile-archive-unique-tags (items)
   "Parse unique tags from the page items"
@@ -64,7 +63,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
 
 (defun pile-archive-tag-cloud ()
   "Return a tag cloud"
-  (let ((items (pile-archive-remove-drafts (pile-archive-parse))))
+  (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
     (pile-tags-format-tags (pile-archive-unique-tags items))))
 
 (defun pile-archive-format (page-alist)
@@ -82,7 +81,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
             (if tags (pile-tags-format-tags tags) ""))))
 
 (defun pile-archive ()
-  (let ((items (pile-archive-remove-drafts (pile-archive-parse))))
+  (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
     (s-join "\n" (-map #'pile-archive-format (-sort (lambda (a b)
                                                       (string-lessp (cdr (assoc 'date b))
                                                                     (cdr (assoc 'date a))))
@@ -105,7 +104,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (cl-remove-if-not #'pile-blog-valid-project-p pile-projects))
+                                       (-filter #'pile-blog-valid-project-p pile-projects))
                    :action #'pile-archive-regenerate-page)))
 
 

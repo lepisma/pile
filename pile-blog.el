@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'dash)
 (require 'f)
 (require 'helm)
 (require 'pile-utils)
@@ -56,7 +57,7 @@
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (cl-remove-if-not #'pile-blog-valid-project-p pile-projects))
+                                       (-filter #'pile-blog-valid-project-p pile-projects))
                    :action (lambda (pj) (find-file (pile-blog--create-post (read-string "Post name: ") pj))))
         :buffer "*helm pile blog new post*"))
 
