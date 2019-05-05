@@ -104,7 +104,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter #'pile-blog-valid-project-p pile-projects))
+                                       (-filter #'pile-blog-p pile-projects))
                    :action #'pile-archive-regenerate-page)))
 
 

@@ -46,7 +46,7 @@
       (make-directory post-dir t)
       index-file)))
 
-(defun pile-blog-valid-project-p (pj)
+(defun pile-blog-p (pj)
   "Tell if the project is a valid blog"
   (and (eq (oref pj :type) 'blog)
        (f-exists-p (f-join (oref pj :input-dir) "index.org"))))
@@ -57,7 +57,7 @@
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter #'pile-blog-valid-project-p pile-projects))
+                                       (-filter #'pile-blog-p pile-projects))
                    :action (lambda (pj) (find-file (pile-blog--create-post (read-string "Post name: ") pj))))
         :buffer "*helm pile blog new post*"))
 
