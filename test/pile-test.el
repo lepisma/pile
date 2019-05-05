@@ -24,3 +24,11 @@
        "#+TAGS: hello-world, testing,this"
        (pile-tags-parse-buffer))
      :to-equal '("hello-world" "testing" "this"))))
+
+(describe "Title parsing"
+  (it "works"
+    (expect
+     (with-string-in-file
+       "#+TITLE: this is the title"
+       (pile--file-title fname))
+     :to-equal "this is the title")))

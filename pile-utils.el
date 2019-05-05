@@ -46,8 +46,8 @@
   (with-temp-buffer
     (insert-file-contents file nil nil 1000)
     (goto-char (point-min))
-    (re-search-forward "^#\\+TITLE:")
-    (s-trim (buffer-substring-no-properties (point) (line-end-position)))))
+    (when (re-search-forward "^#\\+TITLE:\\(.*\\)$")
+      (s-trim (match-string-no-properties 1)))))
 
 (defun pile--goto-top ()
   "Move point to the top of file just after the headers"
