@@ -1,13 +1,9 @@
+(push "test" load-path)
+(require 'test-utils)
+
+(require 'f)
 (require 'pile-tags)
 (require 'pile-utils)
-
-
-(defmacro with-string-in-buffer (string &rest body)
-  (declare (indent defun))
-  `(with-temp-buffer
-     (insert ,string)
-     (goto-char (point-min))
-     ,@body))
 
 (describe "Option parsing"
   (it "works"
