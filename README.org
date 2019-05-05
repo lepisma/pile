@@ -1,5 +1,7 @@
 #+TITLE: pile
 
+[[https://travis-ci.com/lepisma/pile][https://img.shields.io/travis/com/lepisma/pile/master.svg?style=flat-square]]
+
 Source code for my [[https://lepisma.github.io/][web site]] setup. ~pile~ wraps around ~org-publish~ and adds a few
 functions to improve the experience of generating static htmls.
 
