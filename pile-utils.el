@@ -67,19 +67,15 @@
   "Get project by name"
   (-find (lambda (pj) (string-equal name (oref pj :name))) pile-projects))
 
-(defun pile--parse-option (text)
-  (-map (lambda (kv)
-          (-let [(k . v) (s-split ":" kv)]
-            (cons (intern k) (read v))))
-        (s-split " " text)))
-
 (defun pile-read-options ()
   "Read options from org file"
   (save-excursion
     (goto-char (point-min))
-    (if (re-search-forward "^#\\+PILE:" nil t)
-        (let ((text (buffer-substring-no-properties (point) (line-end-position))))
-          (pile--parse-option (s-trim text))))))
+    (when (re-search-forward "^#\\+PILE:\\(.*\\)$" nil t)
+      (->> (match-string-no-properties 1)
+         s-trim
+         (s-split " ")
+         (-map (lambda (kv) (-let [(k . v) (s-split ":" kv)] (cons (intern k) (read v)))))))))
 
 ;;;###autoload
 (defun pile-clear-cache ()

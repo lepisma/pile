@@ -33,9 +33,8 @@
 (defun pile-tags-parse-buffer ()
   "Return a list of tags from the current buffer."
   (goto-char (point-min))
-  (if (re-search-forward "^#\\+TAGS:" nil t)
-      (let* ((text (buffer-substring-no-properties (point) (line-end-position))))
-        (-map #'s-trim (s-split "," text)))))
+  (when (re-search-forward "^#\\+TAGS:\\(.*\\)$" nil t)
+    (-map #'s-trim (s-split "," (match-string-no-properties 1)))))
 
 (defun pile-tags-format-tags (tags &optional archive-page)
   "Format tags and return html"
