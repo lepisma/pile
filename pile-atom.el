@@ -82,10 +82,11 @@
 (defun pile-atom-regenerate-page (pj)
   "Regenerate atom.xml file for project PJ. Also copy the file in deploy
 directory."
-  (let ((text (pile-atom-generate pj)))
+  (let ((text (pile-atom-generate pj))
+        (dirs (list (oref pj :input-dir) (oref pj :output-dir))))
     (when text
-      (f-write-text text 'utf-8 (f-join (oref pj :input-dir) "atom.xml"))
-      (f-write-text text 'utf-8 (f-join (oref pj :output-dir) "atom.xml")))))
+      (dolist (d dirs)
+        (f-write-text text 'utf-8 (f-join d "atom.xml"))))))
 
 (defun pile-atom-regenerate ()
   (interactive)
