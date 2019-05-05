@@ -52,9 +52,10 @@
   "Function to add dropcap"
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))
-         (dc-opt (assoc 'dropcap (pile-read-options))))
+         ;; NOTE: Dropcaps are enabled by default
+         (enable-dc (alist-get 'dropcap (pile-read-options) t)))
     (unless (or (string-equal fname (f-join (oref pj :input-dir) "index.org"))
-                (and dc-opt (null (cdr dc-opt))))
+                (null enable-dc))
       (pile-dropcap-goto-first-char)
       (insert (format "@@html:<span class='dropcap'>%s</span>@@"
                       (buffer-substring-no-properties (point) (+ 1 (point)))))

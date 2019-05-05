@@ -50,7 +50,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
                 (insert-file-contents-literally fname nil nil 1000)
                 `((link . ,(concat "./" link))
                   (title . ,title)
-                  (draft . ,(cdr (assoc 'draft (pile-read-options))))
+                  (draft . ,(alist-get 'draft (pile-read-options)))
                   (tags . ,(pile-tags-parse-buffer))
                   (date . ,(pile-date-parse-date fname)))))) org-files)))
 
@@ -59,7 +59,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
 
 (defun pile-archive-unique-tags (items)
   "Parse unique tags from the page items"
-  (-sort #'string-lessp (-uniq (-mapcat (lambda (item) (cdr (assoc 'tags item))) items))))
+  (-sort #'string-lessp (-uniq (-mapcat (lambda (item) (alist-get 'tags item)) items))))
 
 (defun pile-archive-tag-cloud ()
   "Return a tag cloud"
@@ -67,7 +67,7 @@ TODO: This is a mess. Some times I am working with a fname arg,
     (pile-tags-format-tags (pile-archive-unique-tags items))))
 
 (defun pile-archive-format (page-alist)
-  (let ((tags (cdr (assoc 'tags page-alist))))
+  (let ((tags (alist-get 'tags page-alist)))
     (format "
 #+HTML: <div class='archive-item'>
 #+HTML: <div class='page-meta'>%s</div>
@@ -75,16 +75,16 @@ TODO: This is a mess. Some times I am working with a fname arg,
 [[file:%s][%s]]
 %s
 #+HTML: </div>"
-            (cdr (assoc 'date page-alist))
-            (cdr (assoc 'link page-alist))
-            (cdr (assoc 'title page-alist))
+            (alist-get 'date page-alist)
+            (alist-get 'link page-alist)
+            (alist-get 'title page-alist)
             (if tags (pile-tags-format-tags tags) ""))))
 
 (defun pile-archive ()
   (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
     (s-join "\n" (-map #'pile-archive-format (-sort (lambda (a b)
-                                                      (string-lessp (cdr (assoc 'date b))
-                                                                    (cdr (assoc 'date a))))
+                                                      (string-lessp (alist-get 'date b)
+                                                                    (alist-get 'date a)))
                                                     items)))))
 
 (defun pile-archive-regenerate-page (pj)
