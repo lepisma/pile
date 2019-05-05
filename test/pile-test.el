@@ -27,4 +27,11 @@
      (with-string-in-file
        "#+TITLE: this is the title"
        (pile--file-title fname))
+     :to-equal "this is the title"))
+
+  (it "is case insensitive (for key)"
+    (expect
+     (with-string-in-file
+       "#+titLe: this is the title"
+       (pile--file-title fname))
      :to-equal "this is the title")))
