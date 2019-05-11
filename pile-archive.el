@@ -90,9 +90,9 @@ TODO: This is a mess. Some times I am working with a fname arg,
 (defun pile-archive-regenerate-page (pj)
   "Regenerate the index.org page for the blog type project."
   (let ((index-file (f-join (oref pj :input-dir) "index.org")))
-    (if (f-exists-p index-file)
-        (with-current-buffer (find-file-noselect index-file)
-          (pile-publish-current-file t)))))
+    (when (f-exists-p index-file)
+      (with-current-buffer (find-file-noselect index-file)
+        (pile-publish-current-file t)))))
 
 (defun pile-archive-page-p (file-path)
   "Tell if the page is 'the' archive page for its project."
