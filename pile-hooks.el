@@ -96,6 +96,12 @@
                (not (pile-archive-page-p ifile)))
       (pile-archive-regenerate-page pj))))
 
+(defun pile-hooks-post-generate-sitemap (ifile ofile)
+  "Refresh sitemap for wiki pages on export."
+  (let ((pj (pile-get-project-from-file ifile)))
+    (when (eq (oref pj :type) 'wiki)
+      (pile-sitemap-regenerate-page pj))))
+
 (provide 'pile-hooks)
 
 ;;; pile-hooks.el ends here

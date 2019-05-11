@@ -58,6 +58,17 @@
                    (org-publish-find-title index-file project))))
         (t entry)))
 
+(defun pile-sitemap-regenerate-page (pj)
+  "Regenerate sitemap.org, main index.org and every parent's
+index.org for a wiki project."
+  (let ((index-file (f-join (f-parent (f-parent (buffer-file-name))) "index.org")))
+    (org-publish-sitemap (pile-project-pages-config pj))
+    (while (f-parent-of-p (oref pj :input-dir) index-file)
+      (when (f-exists-p index-file)
+        (with-current-buffer (find-file-noselect index-file)
+          (pile-publish-current-file t)))
+      (setq index-file (f-join (f-parent (f-parent index-file)) "index.org")))))
+
 (provide 'pile-sitemap)
 
 ;;; pile-sitemap.el ends here
