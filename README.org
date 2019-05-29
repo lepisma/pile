@@ -2,7 +2,7 @@
 
 [[https://travis-ci.com/lepisma/pile][https://img.shields.io/travis/com/lepisma/pile/master.svg?style=flat-square]]
 
-Source code for my [[https://lepisma.github.io/][web site]] setup. ~pile~ wraps around ~org-publish~ and adds a few
+Source code for my [[https://lepisma.xyz/][web site]] setup. ~pile~ wraps around ~org-publish~ and adds a few
 functions to improve the experience of generating static htmls.
 
 The package lives on a /commit-on-need/ basis so might not be in good shape at any
