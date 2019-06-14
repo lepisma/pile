@@ -1,11 +1,11 @@
-;;; pile-annotate.el --- Annotation system for pile -*- lexical-binding: t; -*-
+;;; pile-issue.el --- Issue system for writing -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2019 Abhinav Tushar
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
 ;;; Commentary:
 
-;; Annotation system for pile
+;; Issue system for writing
 ;; This file is not a part of GNU Emacs.
 
 ;;; License:
@@ -28,36 +28,29 @@
 (require 'f)
 (require 'org)
 
-(org-add-link-type "pile-annotate" #'pile-annotate-follow #'pile-annotate-export)
+(org-add-link-type "pile-issue" #'pile-issue-follow #'pile-issue-export)
 
-(defun pile-annotate--find-annotation (annotation-id)
-  "Return headline with given annotation-id."
+(defun pile-issue--find-issue (issue-id)
+  "Return headline with given issue-id."
   (let ((found-heading nil))
     (org-element-map (org-element-parse-buffer) 'headline
       (lambda (headline)
-        (when (string= annotation-id (org-element-property :ANNOTATION-ID headline))
+        (when (string= issue-id (org-element-property :ISSUE-ID headline))
           (setq found-heading headline))))
     found-heading))
 
-(defun pile-annotate-follow (annotation-id)
-  "Open annotation in a side buffer."
-  (let* ((annot-file (concat (f-swap-ext (buffer-file-name) "annotations") ".org"))
-         (_ (find-file-other-window annot-file))
-         (found-heading (pile-annotate--find-annotation annotation-id)))
+(defun pile-issue-follow (issue-id)
+  "Open issue annotation in a side buffer."
+  (let* ((issues-file (concat (f-swap-ext (buffer-file-name) "issues") ".org"))
+         (_ (find-file-other-window issues-file))
+         (found-heading (pile-issue--find-issue issue-id)))
     (when found-heading
       (goto-char (org-element-property :contents-begin found-heading)))))
 
-(defun pile-annotate-export (annotation-id desc backend)
-  "Export list of items in the playlist"
+(defun pile-issue-export (issue-id _desc backend)
   (when (eq backend 'html)
-    (let* ((annot-file (concat (f-swap-ext (buffer-file-name) "annotations") ".org"))
-           (_ (find-file-other-window annot-file))
-           (found-heading (pile-annotate--find-annotation annotation-id))
-           (org-export-show-temporary-export-buffer nil))
-      (when found-heading
-        (error "NI")))))
+    (format "<span class=\"pile-issue-icon\">⚠ %s</span>" issue-id)))
 
+(provide 'pile-issue)
 
-(provide 'pile-annotate)
-
-;;; pile-annotate.el ends here
+;;; pile-issue.el ends here
