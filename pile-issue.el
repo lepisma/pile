@@ -38,15 +38,21 @@
 "
   "Template for a new issue file.")
 
+(defun pile-issue--headline-id (headline)
+  "Tell issue id for a given headline element (org-element API)
+ if the headline is an issue."
+  (let ((cid (org-element-property :CUSTOM_ID headline)))
+    (when (string-match "pile-issue-\\([[:digit:]]+\\)" cid)
+      (string-to-number (match-string 1 cid)))))
+
 (defun pile-issue--max-id ()
   "Return maximum issue id. If nothing, return 0. Assume current
 buffer to be an issue buffer."
   (let ((issue-ids))
     (org-element-map (org-element-parse-buffer) 'headline
       (lambda (headline)
-        (let ((cid (org-element-property :CUSTOM_ID headline)))
-          (when (string-match "pile-issue-\\([[:digit:]]+\\)" cid)
-            (push (string-to-number (match-string 1)) issue-ids)))))
+        (let ((issue-id (pile-issue--headline-id headline)))
+          (push issue-id issue-ids))))
     (if issue-ids (apply #'max issue-ids) 0)))
 
 (defun pile-issue--find-issue (issue-id)
@@ -54,13 +60,19 @@ buffer to be an issue buffer."
   (let ((found-heading nil))
     (org-element-map (org-element-parse-buffer) 'headline
       (lambda (headline)
-        (when (string= (format "pile-issue-%s" issue-id) (org-element-property :CUSTOM_ID headline))
+        (when (= issue-id (pile-issue--headline-id headline))
           (setq found-heading headline))))
     found-heading))
 
-(defun pile-issue--file ()
+(defun pile-issue--file? (&optional file-path)
+  "Tell if given path or current buffer is an issue file."
+  (s-ends-with? "issues.org" (or file-path (buffer-file-name))))
+
+(defun pile-issue-file ()
   "Return issue file path for current buffer."
-  (f-swap-ext (buffer-file-name) "issues.org"))
+  (if (pile-issue--file?)
+      (buffer-file-name)
+    (f-swap-ext (buffer-file-name) "issues.org")))
 
 (defun pile-issue--create-file ()
   "Create an issue file for current pile buffer."
@@ -87,17 +99,18 @@ file."
         (insert "* " title "\n")
         (org-set-property "CUSTOM_ID" (format "pile-issue-%s" issue-id))))))
 
-(defun pile-issue-follow (issue-id)
+(defun pile-issue-follow (issue-id-str)
   "Open issue annotation in a side buffer."
-  (let* ((issus-file (f-swap-ext (buffer-file-name) "issues.org"))
+  (let* ((issue-file (pile-issue--file))
          (_ (find-file-other-window issue-file))
-         (found-heading (pile-issue--find-issue issue-id)))
-    (when found-heading
-      (goto-char (org-element-property :contents-begin found-heading)))))
+         (found-heading (pile-issue--find-issue (string-to-number issue-id-str))))
+    (if found-heading
+        (goto-char (org-element-property :contents-begin found-heading))
+      (message "No issue found with such id"))))
 
 (defun pile-issue-export (issue-id _desc backend)
   (when (eq backend 'html)
-    (format "<span class=\"pile-issue-icon\">⚠ %s</span>" issue-id)))
+    (error "Not Implemented")))
 
 (provide 'pile-issue)
 
