@@ -38,7 +38,17 @@
 "
   "Template for a new issue file.")
 
-(defun pile-issue--headline-id (headline)
+(defun pile-issue? (headline)
+  "Tell if this headline is an issue."
+  (let ((cid (org-element-property :CUSTOM_ID headline)))
+    (and cid (string-match "pile-issue-\\([[:digit:]]+\\)" cid))))
+
+(defun pile-issue--parse-issues ()
+  "Parse issues (headlines) from current buffer"
+  (org-element-map (org-element-parse-buffer) 'headline
+    (lambda (headline) (when (pile-issue? headline) headline))))
+
+(defun pile-issue--id (headline)
   "Tell issue id for a given headline element (org-element API)
  if the headline is an issue."
   (let ((cid (org-element-property :CUSTOM_ID headline)))
@@ -48,21 +58,13 @@
 (defun pile-issue--max-id ()
   "Return maximum issue id. If nothing, return 0. Assume current
 buffer to be an issue buffer."
-  (let ((issue-ids))
-    (org-element-map (org-element-parse-buffer) 'headline
-      (lambda (headline)
-        (let ((issue-id (pile-issue--headline-id headline)))
-          (push issue-id issue-ids))))
-    (if issue-ids (apply #'max issue-ids) 0)))
+  (let ((issues (pile-issue--parse-issues)))
+    (if issues (apply #'max (mapcar #'pile-issue--id issues)) 0)))
 
 (defun pile-issue--find-issue (issue-id)
   "Return headline with given issue-id."
-  (let ((found-heading nil))
-    (org-element-map (org-element-parse-buffer) 'headline
-      (lambda (headline)
-        (when (= issue-id (pile-issue--headline-id headline))
-          (setq found-heading headline))))
-    found-heading))
+  (let ((issues (pile-issue--parse-issues)))
+    (find issue-id issues :key #'pile-issue--id)))
 
 (defun pile-issue--file? (&optional file-path)
   "Tell if given path or current buffer is an issue file."
@@ -106,7 +108,7 @@ file."
          (found-heading (pile-issue--find-issue (string-to-number issue-id-str))))
     (if found-heading
         (goto-char (org-element-property :contents-begin found-heading))
-      (message "No issue found with such id"))))
+      (message "No issue with given id: %s" issue-id-str))))
 
 (defun pile-issue-export (issue-id _desc backend)
   (when (eq backend 'html)
