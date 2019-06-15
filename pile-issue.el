@@ -110,9 +110,10 @@ file."
         (goto-char (org-element-property :contents-begin found-heading))
       (message "No issue with given id: %s" issue-id-str))))
 
-(defun pile-issue-export (issue-id _desc backend)
+(defun pile-issue-export (issue-id-str desc backend)
   (when (eq backend 'html)
-    (error "Not Implemented")))
+    ;; TODO: This is not final, there might be better way to export links
+    (format "<a href=\"hello\" class=\"btn btn-small\"> 	🛈  %s</a>" issue-id-str desc)))
 
 (provide 'pile-issue)
 
