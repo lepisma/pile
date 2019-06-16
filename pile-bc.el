@@ -72,13 +72,19 @@
             (if (zerop (length parents)) "" (format "%s /" (pile-bc--linkify-parents parents)))
             (pile-bc--page-title rel-path))))
 
+(defun pile-bc-added? ()
+  "Tell if we already have breadcrumbs."
+  (goto-char (point-min))
+  (re-search-forward "^#\\+HTML:<div id='breadcrumbs'>" nil t))
+
 (defun pile-bc-add ()
   "Function to insert breadcrumbs in the current file."
-  (let* ((fname (buffer-file-name))
-         (pj (pile-get-project-from-file fname))
-         (rel-path (s-chop-suffix ".org" (f-relative fname (oref pj :input-dir)))))
-    (pile--goto-top)
-    (insert (pile-bc-generate-breadcrumbs rel-path (oref pj :input-dir)))))
+  (unless (pile-bc-added?)
+    (let* ((fname (buffer-file-name))
+           (pj (pile-get-project-from-file fname))
+           (rel-path (s-chop-suffix ".org" (f-relative fname (oref pj :input-dir)))))
+      (pile--goto-top)
+      (insert (pile-bc-generate-breadcrumbs rel-path (oref pj :input-dir))))))
 
 (provide 'pile-bc)
 
