@@ -77,9 +77,8 @@
   (let* ((fname (buffer-file-name))
          (pj (pile-get-project-from-file fname))
          (rel-path (s-chop-suffix ".org" (f-relative fname (oref pj :input-dir)))))
-    (unless (string-equal "sitemap" rel-path)
-      (pile--goto-top)
-      (insert (pile-bc-generate-breadcrumbs rel-path (oref pj :input-dir))))))
+    (pile--goto-top)
+    (insert (pile-bc-generate-breadcrumbs rel-path (oref pj :input-dir)))))
 
 (provide 'pile-bc)
 

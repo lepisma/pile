@@ -30,6 +30,7 @@
 (require 'pile-cids)
 (require 'pile-date)
 (require 'pile-dropcap)
+(require 'pile-index)
 (require 'pile-tags)
 (require 'pile-utils)
 (require 's)
@@ -96,11 +97,15 @@
                (not (pile-archive-page-p ifile)))
       (pile-archive-regenerate-page pj))))
 
-(defun pile-hooks-post-generate-sitemap (ifile ofile)
-  "Refresh sitemap for wiki pages on export."
+(defun pile-hooks-post-generate-index (ifile _ofile)
+  "Refresh indices for wiki tree on export. We keep walking up
+the hierarchy starting from ifile and regenerate all the pages involved."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (eq (oref pj :type) 'wiki)
-      (pile-sitemap-regenerate-page pj))))
+      (let ((parent-index-file (f-join (f-parent (f-parent ifile)) "index.org")))
+        (when (f-exists? parent-index-file)
+          (with-current-buffer (find-file-noselect parent-index-file)
+            (pile-publish-current-file t)))))))
 
 (provide 'pile-hooks)
 

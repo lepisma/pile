@@ -46,7 +46,6 @@
 (require 'pile-serve)
 (require 'pile-ref)
 (require 'pile-atom)
-(require 'pile-sitemap)
 (require 'pile-hooks)
 (require 'org)
 (require 'ox-html)
@@ -116,14 +115,7 @@ These functions are directly appended to org-publish-after-publishing-hook."
   "Get org-publish config for pages"
   (let ((type (oref pj :type)))
     `(,(format "pile-%s-pages" (oref pj :name))
-      ,@(if (eq type 'wiki)
-            (list
-             :auto-sitemap t
-             :sitemap-filename "sitemap.org"
-             :sitemap-title "Sitemap"
-             :sitemap-format-entry 'pile-sitemap-format-wiki
-             :sitemap-function 'pile-sitemap-wiki)
-          (list :auto-sitemap nil))
+      :auto-sitemap nil
       :base-directory ,(oref pj :input-dir)
       :recursive t
       :publishing-directory ,(oref pj :output-dir)
