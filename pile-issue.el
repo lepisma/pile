@@ -78,7 +78,7 @@ buffer to be an issue buffer."
 
 (defun pile-issue--create-file ()
   "Create an issue file for current pile buffer."
-  (let ((issue-file (pile-issue--file)))
+  (let ((issue-file (pile-issue-file)))
     (if (f-exists? issue-file)
         (message "Issues file already present.")
       (let ((title (concat (pile--name-to-id (pile--file-title (buffer-file-name))) "/issues"))
@@ -92,7 +92,7 @@ buffer to be an issue buffer."
   "Create a new issue, incrementing the maximum id present in the
 file."
   (interactive "sIssue title: ")
-  (let ((issue-file (pile-issue--file)))
+  (let ((issue-file (pile-issue-file)))
     (when (not (f-exists? issue-file))
       (pile-issue--create-file))
     (with-current-buffer (find-file-noselect issue-file)
@@ -103,7 +103,7 @@ file."
 
 (defun pile-issue-follow (issue-id-str)
   "Open issue annotation in a side buffer."
-  (let* ((issue-file (pile-issue--file))
+  (let* ((issue-file (pile-issue-file))
          (_ (find-file-other-window issue-file))
          (found-heading (pile-issue--find-issue (string-to-number issue-id-str))))
     (if found-heading
