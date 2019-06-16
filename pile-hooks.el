@@ -102,7 +102,9 @@
 the hierarchy starting from ifile and regenerate all the pages involved."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (eq (oref pj :type) 'wiki)
-      (let ((parent-index-file (f-join (f-parent (f-parent ifile)) "index.org")))
+      (let ((parent-index-file (if (s-ends-with? "index.org" ifile)
+                                   (f-join (f-parent (f-parent ifile)) "index.org")
+                                 (f-join (f-parent ifile) "index.org"))))
         (when (f-exists? parent-index-file)
           (with-current-buffer (find-file-noselect parent-index-file)
             (pile-publish-current-file t)))))))
