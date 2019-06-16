@@ -79,12 +79,6 @@ an absolute path, title and a list of children if present."
         (children . ,(append (mapcar #'pile-index--org-to-alist sibling-files)
                              (mapcar #'pile-index-parse sub-dirs)))))))
 
-(defun pile-index--sort-children (index-tree)
-  "Sort children based on certain logic. Right now the logic is
-hardcoded as lexical ordering on title."
-  ;; TODO: Implement this
-  index-tree)
-
 (defun pile-index--format-node (node root-dir level)
   "Format a single entry."
   (let ((indent (s-join "" (-repeat level "  "))))
@@ -106,7 +100,7 @@ hardcoded as lexical ordering on title."
   "Return string representation of the index tree. Call this in
 the index pages of wiki."
   (let ((index-tree (pile-index-parse default-directory)))
-    (pile-index--format (pile-index--sort-children index-tree) default-directory)))
+    (pile-index--format index-tree default-directory)))
 
 (provide 'pile-index)
 
