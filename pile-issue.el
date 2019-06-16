@@ -33,7 +33,7 @@
 
 (org-add-link-type "pile-issue" #'pile-issue-follow #'pile-issue-export)
 
-(defcustom pile-issue-file-template "#+TITLE: {{ page-title }}
+(defcustom pile-issue-file-template "#+TITLE: ~:{{ page-title }}/issues~
 #+SETUPFILE: {{ setupfile }}
 "
   "Template for a new issue file.")
@@ -81,7 +81,7 @@ buffer to be an issue buffer."
   (let ((issue-file (pile-issue-file)))
     (if (f-exists? issue-file)
         (message "Issues file already present.")
-      (let ((title (concat (pile--name-to-id (pile--file-title (buffer-file-name))) "/issues"))
+      (let ((title (pile--name-to-id (pile--file-title (buffer-file-name))))
             (setupfile (concat (f-relative (locate-dominating-file "." "assets") ".") "assets/export.setup")))
         (with-current-buffer (find-file-noselect issue-file)
           (insert (mustache-render pile-issue-file-template
