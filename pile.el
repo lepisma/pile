@@ -41,6 +41,7 @@
 (require 'pile-date)
 (require 'pile-dropcap)
 (require 'pile-index)
+(require 'pile-issue)
 (require 'pile-path)
 (require 'pile-link)
 (require 'pile-serve)
