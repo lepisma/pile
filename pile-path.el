@@ -47,7 +47,14 @@
 (defun pile-path-abs-to-pile (abs-path)
   "Return pile-path from the abs-path."
   (let ((pj (pile-path-abs-project abs-path)))
-    (if pj (format "%s:%s" (oref pj :name) (f-relative abs-path (oref pj :input-dir))))))
+    (when pj
+      (format "%s:%s" (oref pj :name) (f-relative abs-path (oref pj :input-dir))))))
+
+(defun pile-path-abs-to-rel (abs-path)
+  "Return rel path from the abs-path."
+  (let ((pj (pile-path-abs-project abs-path)))
+    (when pj
+      (f-relative abs-path (oref pj :input-dir)))))
 
 (defun pile-path-rel-to-org (rel-path pj)
   "Return rel path of the .org file in that project. Also works

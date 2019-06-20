@@ -76,6 +76,12 @@ buffer to be an issue buffer."
       (buffer-file-name)
     (f-swap-ext (buffer-file-name) "issues.org")))
 
+(defun pile-main-file ()
+  "Return main file path for current buffer."
+  (if (pile-issue--file?)
+      (s-replace-regexp "\\(\\.issues\\)\\.org" "" (buffer-file-name) nil nil 1)
+    (buffer-file-name)))
+
 (defun pile-issue--create-file ()
   "Create an issue file for current pile buffer."
   (let ((issue-file (pile-issue-file)))
@@ -122,6 +128,16 @@ count of unresolved issues. Return 0 as the nil case."
           (if unresolved-only
               (length (-remove (lambda (headline) (eq 'done (org-element-property :todo-type headline))) headlines))
             (length headlines)))))))
+
+(defun pile-issue-format-crosslink ()
+  "Format links for insertion in crosslinks section."
+  (if (pile-issue--file?)
+      (format "<a href=\"./%s\" class=\"btn small\">🖹 | main text</a>"
+              (f-filename (f-swap-ext (pile-main-file) "html")))
+    (when (f-exists? (pile-issue-file))
+      (format "<a href=\"./%s\" class=\"btn small highlight\">%s / %s | open issues</a>"
+              (f-filename (f-swap-ext (pile-issue-file) "html"))
+              (pile-issue-count t) (pile-issue-count)))))
 
 (defun pile-issue-export (issue-id-str desc backend)
   (when (eq backend 'html)

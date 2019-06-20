@@ -101,9 +101,9 @@
 (defmacro with-pile-hooks (&rest body)
   "Run body with pile related export hooks set."
   (let* ((add-forms `((dolist (hook pre-hooks)
-                        (add-hook 'org-export-before-parsing-hook hook))
+                        (add-hook 'org-export-before-parsing-hook hook t))
                       (dolist (hook pile-post-publish-hook)
-                        (add-hook 'org-publish-after-publishing-hook hook))))
+                        (add-hook 'org-publish-after-publishing-hook hook t))))
          (remove-forms `((dolist (hook pre-hooks)
                            (remove-hook 'org-export-before-parsing-hook hook)
                            (unintern hook nil))

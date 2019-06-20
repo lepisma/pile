@@ -40,6 +40,20 @@
   (pile-when-type '(wiki)
     (pile-bc-add)))
 
+(defun pile-hooks-pre-add-crosslinks ()
+  "Add cross links for given page. This needs to be called after
+bc hook."
+  ;; TODO: Move this somewhere safe
+  (pile-when-type '(wiki)
+    (goto-char (point-min))
+    (unless (re-search-forward "^#\\+HTML:<div id='crosslinks'>" nil t)
+      (pile-bc-skip)
+      (insert "\n")
+      (let ((links))
+        (-if-let (issue-link (pile-issue-format-crosslink))
+            (push issue-link links))
+        (insert (format "#+HTML:<div id='crosslinks'>%s</div>" (s-join " " links)))))))
+
 (defun pile-hooks-pre-add-cids ()
   "Add cids in the org file for wiki and blog projects."
   (pile-when-type '(blog wiki)
