@@ -110,6 +110,19 @@ file."
         (goto-char (org-element-property :contents-begin found-heading))
       (message "No issue with given id: %s" issue-id-str))))
 
+(defun pile-issue-count (&optional unresolved-only)
+  "Return count of issues for the current page. We don't go down
+in the tree recursively. If UNRESOLVED-ONLY is not nil return
+count of unresolved issues. Return 0 as the nil case."
+  (let ((issue-file (pile-issue-file)))
+    (if (not (f-exists? issue-file))
+        0
+      (with-current-buffer (find-file-noselect issue-file)
+        (let ((headlines (pile-issue--parse-issues)))
+          (if unresolved-only
+              (length (-remove (lambda (headline) (eq 'done (org-element-property :todo-type headline))) headlines))
+            (length headlines)))))))
+
 (defun pile-issue-export (issue-id-str desc backend)
   (when (eq backend 'html)
     ;; TODO: This is not final, there might be better way to export links
