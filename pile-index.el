@@ -31,6 +31,7 @@
 (require 'f)
 (require 's)
 (require 'pile-utils)
+(require 'pile-issue)
 
 (defcustom pile-index-ignore-patterns
   '("\\.issues\\.org$")
@@ -79,13 +80,26 @@ an absolute path, title and a list of children if present."
         (children . ,(append (mapcar #'pile-index--org-to-alist sibling-files)
                              (mapcar #'pile-index-parse sub-dirs)))))))
 
+(defun pile-index--issue-path (abs-path root-dir)
+  "Whether to show issue link for the page. If yes, then return
+the relative path to issue page."
+  (with-current-buffer (find-file-noselect abs-path)
+    (when (< 0 (pile-issue-count t))
+      (f-relative (pile-issue-file) root-dir))))
+
+(defun pile-index--issue-page-link (rel-link)
+  (format "@@html:<a href=\"./%s\" title=\"open issues page\">ⓘ </a>@@" rel-link))
+
 (defun pile-index--format-node (node root-dir level)
   "Format a single entry."
-  (let ((indent (s-join "" (-repeat level "  "))))
-    (format "%s- [[./%s][%s]]\n"
+  (let* ((indent (s-join "" (-repeat level "  ")))
+         (abs-path (alist-get 'path node))
+         (issue-path (pile-index--issue-path abs-path root-dir)))
+    (format "%s- [[./%s][%s]]%s\n"
             indent
-            (f-relative (alist-get 'path node) root-dir)
-            (alist-get 'title node))))
+            (f-relative abs-path root-dir)
+            (alist-get 'title node)
+            (if issue-path (concat " | " (pile-index--issue-page-link (f-swap-ext issue-path "html"))) ""))))
 
 (defun pile-index--format (index-tree root-dir &optional level)
   "Format index tree as org list"
