@@ -32,6 +32,7 @@
 (require 'helm)
 (require 'ht)
 (require 'mustache)
+(require 'pile-base)
 (require 'pile-archive)
 (require 'pile-blog)
 (require 'pile-path)
@@ -54,7 +55,7 @@
 </feed>"
   "Template for atom.xml file")
 
-(defun pile-atom-parse-archive-item (pj archive-item)
+(cl-defmethod pile-atom-parse-archive-item ((pj pile-project-blog) archive-item)
   "Create an ht for the ITEM generated from pile-archive."
   (let* ((link (alist-get 'link archive-item))
          (base-url-text (if (string-equal (oref pj :base-url) "") "" (file-name-as-directory (oref pj :base-url))))
@@ -65,20 +66,19 @@
     (let ((archive-item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) archive-item)))
       (ht<-alist archive-item))))
 
-(defun pile-atom-format (pj)
+(cl-defmethod pile-atom-format ((pj pile-project-blog))
   "Generate string representation of the feed for the project PJ."
-  (when (eq (oref pj :type) 'blog)
-    (let* ((default-directory (oref pj :input-dir))
-           (items (->> (pile-archive-parse) (-remove #'pile-archive-draft-p) (-sort #'pile-archive-comparator))))
-      (mustache-render pile-atom-template
-                       (ht ("root-author" (user-full-name))
-                           ("root-title" (oref pj :name))
-                           ("root-url" (concat (file-name-as-directory (oref pj :root-url))
-                                               (oref pj :base-url)))
-                           ("root-date" (format-time-string "%Y-%m-%d"))
-                           ("entry" (mapcar (-cut pile-atom-parse-archive-item pj <>) items)))))))
+  (let* ((default-directory (oref pj :input-dir))
+         (items (->> (pile-archive-parse) (-remove #'pile-archive-draft-p) (-sort #'pile-archive-comparator))))
+    (mustache-render pile-atom-template
+                     (ht ("root-author" (user-full-name))
+                         ("root-title" (oref pj :name))
+                         ("root-url" (concat (file-name-as-directory (oref pj :root-url))
+                                             (oref pj :base-url)))
+                         ("root-date" (format-time-string "%Y-%m-%d"))
+                         ("entry" (mapcar (-cut pile-atom-parse-archive-item pj <>) items))))))
 
-(defun pile-atom-generate (pj)
+(cl-defmethod pile-atom-generate ((pj pile-project-blog))
   "Regenerate atom.xml file for project PJ. Also copy the file in deploy
 directory."
   (let ((text (pile-atom-format pj))

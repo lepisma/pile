@@ -46,15 +46,26 @@
    (output-dir :initarg :output-dir
                :type string
                :documentation "Output directory for the project")
-   (type :initarg :type
-         :type symbol
-         :documentation "Type of the project, a wiki, blog or static")
    (postamble :initarg :postamble
               :type string
               :documentation "Postamble for the pages")
    (preamble :initarg :preamble
              :type string
-             :documentation "Preamble for the pages")))
+             :documentation "Preamble for the pages"))
+  :abstract t
+  :documentation "Base project type for pile")
+
+(defclass pile-project-wiki (pile-project) ()
+  :documentation "A wiki project.")
+
+(defclass pile-project-blog (pile-project) ()
+  :documentation "A blog type project.")
+
+(defclass pile-project-plain (pile-project) ()
+  :documentation "Simple what-you-org-is-what-you-html pages.")
+
+(defclass pile-project-static (pile-project) ()
+  :documentation "Static type project.")
 
 (cl-defmethod pile-project-static-config ((pj pile-project))
   "Get org-publish static config for the project"
@@ -82,17 +93,22 @@
     :html-preamble ,(oref pj :preamble)))
 
 (cl-defmethod pile-project-config ((pj pile-project))
-  "Pile project config for org-publish"
+  "Pile project config for general projects. This includes pages
+and static config."
   (let ((name (oref pj :name)))
-    (if (eq (oref pj :type) 'static)
-        (list (pile-project-static-config pj)
-              `(,(format "pile-%s" name)
-                :components (,(format "pile-%s-static" name))))
-      (list (pile-project-static-config pj)
-            (pile-project-pages-config pj)
-            `(,(format "pile-%s" name)
-              :components (,(format "pile-%s-pages" name)
-                           ,(format "pile-%s-static" name)))))))
+    (list (pile-project-static-config pj)
+          (pile-project-pages-config pj)
+          `(,(format "pile-%s" name)
+            :components (,(format "pile-%s-pages" name)
+                         ,(format "pile-%s-static" name))))))
+
+(cl-defmethod pile-project-config ((pj pile-project-static))
+  "Project config for static projects. Here we only add a single
+org-publish component."
+  (let ((name (oref pj :name)))
+    (list (pile-project-static-config pj)
+          `(,(format "pile-%s" name)
+            :components (,(format "pile-%s-static" name))))))
 
 (provide 'pile-base)
 

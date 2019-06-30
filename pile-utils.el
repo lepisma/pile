@@ -114,12 +114,19 @@
            (progn ,@add-forms ,@body ,@remove-forms)
          (error (progn ,@remove-forms (signal (car err) (cdr err))))))))
 
-(defmacro pile-when-type (project-types &rest body)
-  "Run the body form when the current buffer type is from one of the given project types."
+(defmacro pile-when-project-type (pj project-types &rest body)
+  "Run body form when given project is one of the types."
   (declare (indent defun))
-  `(let ((pj (pile-get-project-from-file (buffer-file-name))))
-     (when (member (oref pj :type) ,project-types)
+  `(let ((type-names (mapcar (lambda (pt) (intern (format "pile-project-%s" pt))) ,project-types)))
+     (when (member (type-of ,pj) type-names)
        ,@body)))
+
+(defmacro pile-when-type (project-types &rest body)
+  "Run the body form when the current buffer type is from one of
+the given project types."
+  (declare (indent defun))
+  `(pile-when-project-type (pile-get-project-from-file (buffer-file-name)) ,project-types
+     ,@body))
 
 (provide 'pile-utils)
 

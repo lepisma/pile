@@ -30,11 +30,12 @@
 (require 'dash)
 (require 'f)
 (require 'helm)
+(require 'pile-base)
 (require 'pile-utils)
 (require 's)
 
 
-(defun pile-blog--create-post (name pj)
+(cl-defmethod pile-blog--create-post ((pj pile-project-blog) name)
   "Create a new post using current date."
   (cl-destructuring-bind (_ _ _ day month year _ _ _) (decode-time)
     (let* ((post-dir (f-join (oref pj :input-dir)
@@ -46,10 +47,9 @@
       (make-directory post-dir t)
       index-file)))
 
-(defun pile-blog-p (pj)
+(cl-defmethod pile-blog-valid? ((pj pile-project-blog))
   "Tell if the project is a valid blog"
-  (and (eq (oref pj :type) 'blog)
-       (f-exists-p (f-join (oref pj :input-dir) "index.org"))))
+  (f-exists-p (f-join (oref pj :input-dir) "index.org")))
 
 ;;;###autoload
 (defun pile-blog-new-post ()
@@ -57,8 +57,8 @@
   (interactive)
   (helm :sources (helm-build-sync-source "Pile blog projects"
                    :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter #'pile-blog-p pile-projects))
-                   :action (lambda (pj) (find-file (pile-blog--create-post (read-string "Post name: ") pj))))
+                                       (-filter (lambda (pj) (and (pile-project-blog-p pj) (pile-blog-valid? pj))) pile-projects))
+                   :action (lambda (pj) (find-file (pile-blog--create-post pj (read-string "Post name: ")))))
         :buffer "*helm pile blog new post*"))
 
 (defun pile-blog-refile-post (post)

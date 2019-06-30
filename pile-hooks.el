@@ -55,8 +55,8 @@ bc hook."
         (insert (format "#+HTML:<div id='crosslinks'>%s</div>" (s-join " " links)))))))
 
 (defun pile-hooks-pre-add-cids ()
-  "Add cids in the org file for wiki and blog projects."
-  (pile-when-type '(blog wiki)
+  "Add cids in the org file."
+  (pile-when-type '(blog wiki plain)
     (pile-cids-add-all)))
 
 (defun pile-hooks-pre-add-date ()
@@ -65,8 +65,8 @@ bc hook."
     (pile-date-add)))
 
 (defun pile-hooks-pre-add-dropcap ()
-  "Add dropcaps to org files for blog projects."
-  (pile-when-type '(blog)
+  "Add dropcaps."
+  (pile-when-type '(blog plain)
     (pile-dropcap-add)))
 
 (defun pile-hooks-pre-add-tags ()
@@ -77,45 +77,45 @@ bc hook."
 (defun pile-hooks-post-generate-atom (ifile ofile)
   "Regenerate atom files for the current project."
   (let ((pj (pile-get-project-from-file ifile)))
-    (when (and (member (oref pj :type) '(blog))
-               (s-ends-with-p ".html" ofile))
-      (pile-atom-generate pj))))
+    (pile-when-project-type pj '(blog)
+      (when (s-ends-with-p ".html" ofile)
+        (pile-atom-generate pj)))))
 
 (defun pile-hooks-post-clear-cids (ifile ofile)
   "Remove CUSTOM_ID related divs from the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
-    (when (and (member (oref pj :type) '(blog wiki))
-               (s-ends-with-p ".html" ofile))
-      (with-current-buffer (find-file-noselect ofile)
-        (pile-cids-clear-html)
-        (if (buffer-modified-p) (save-buffer))
-        (kill-buffer)))))
+    (pile-when-project-type pj '(blog wiki plain)
+      (when (s-ends-with-p ".html" ofile)
+        (with-current-buffer (find-file-noselect ofile)
+          (pile-cids-clear-html)
+          (if (buffer-modified-p) (save-buffer))
+          (kill-buffer))))))
 
 (defun pile-hooks-post-stringify-title (ifile ofile)
   "Make the title plain text in the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
-    (when (and (member (oref pj :type) '(blog wiki))
-               (s-ends-with-p ".html" ofile))
-      (with-current-buffer (find-file-noselect ofile)
-        (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
-          (let ((old-title (match-string-no-properties 1)))
-            (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
-        (if (buffer-modified-p) (save-buffer))
-        (kill-buffer)))))
+    (pile-when-project-type '(blog wiki plain)
+      (when (s-ends-with-p ".html" ofile)
+        (with-current-buffer (find-file-noselect ofile)
+          (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
+            (let ((old-title (match-string-no-properties 1)))
+              (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
+          (if (buffer-modified-p) (save-buffer))
+          (kill-buffer))))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
   (let ((pj (pile-get-project-from-file ifile)))
-    (when (and (member (oref pj :type) '(blog))
-               (s-ends-with-p ".html" ofile)
-               (not (pile-archive-page-p ifile)))
-      (pile-archive-generate pj))))
+    (pile-when-project-type pj '(blog)
+      (when (and (s-ends-with-p ".html" ofile)
+                 (not (pile-archive-page-p ifile)))
+        (pile-archive-generate pj)))))
 
 (defun pile-hooks-post-generate-index (ifile _ofile)
   "Refresh indices for wiki tree on export. We keep walking up
 the hierarchy starting from ifile and regenerate all the pages involved."
   (let ((pj (pile-get-project-from-file ifile)))
-    (when (eq (oref pj :type) 'wiki)
+    (pile-when-project-type pj '(wiki)
       (let ((parent-index-file (if (s-ends-with? "index.org" ifile)
                                    (f-join (f-parent (f-parent ifile)) "index.org")
                                  (f-join (f-parent ifile) "index.org"))))

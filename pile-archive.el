@@ -29,6 +29,7 @@
 (require 'dash)
 (require 'f)
 (require 'helm)
+(require 'pile-base)
 (require 'pile-blog)
 (require 'pile-date)
 (require 'pile-tags)
@@ -88,8 +89,8 @@ TODO: This is a mess. Some times I am working with a fname arg,
   (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
     (s-join "\n" (-map #'pile-archive-format-item (-sort #'pile-archive-comparator items)))))
 
-(defun pile-archive-generate (pj)
-  "Regenerate the index.org page for the blog type project."
+(cl-defmethod pile-archive-generate ((pj pile-project-blog))
+  "Regenerate the index.org page."
   (let ((index-file (f-join (oref pj :input-dir) "index.org")))
     (when (f-exists-p index-file)
       (with-current-buffer (find-file-noselect index-file)
