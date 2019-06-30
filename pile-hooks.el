@@ -97,6 +97,7 @@ bc hook."
     (pile-when-project-type pj '(blog wiki plain)
       (when (s-ends-with-p ".html" ofile)
         (with-current-buffer (find-file-noselect ofile)
+          (goto-char (point-min))
           (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
             (let ((old-title (match-string-no-properties 1)))
               (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
