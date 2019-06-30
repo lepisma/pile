@@ -109,7 +109,7 @@ bc hook."
     (when (and (member (oref pj :type) '(blog))
                (s-ends-with-p ".html" ofile)
                (not (pile-archive-page-p ifile)))
-      (pile-archive-regenerate-page pj))))
+      (pile-archive-generate pj))))
 
 (defun pile-hooks-post-generate-index (ifile _ofile)
   "Refresh indices for wiki tree on export. We keep walking up

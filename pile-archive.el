@@ -61,12 +61,12 @@ TODO: This is a mess. Some times I am working with a fname arg,
   "Parse unique tags from the page items"
   (-sort #'string-lessp (-uniq (-mapcat (lambda (item) (alist-get 'tags item)) items))))
 
-(defun pile-archive-tag-cloud ()
+(defun pile-archive-format-tag-cloud ()
   "Return a tag cloud"
   (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
     (pile-tags-format-tags (pile-archive-unique-tags items))))
 
-(defun pile-archive-format (page-alist)
+(defun pile-archive-format-item (page-alist)
   (let ((tags (alist-get 'tags page-alist)))
     (format "
 #+HTML: <div class='archive-item'>
@@ -84,11 +84,11 @@ TODO: This is a mess. Some times I am working with a fname arg,
   "Date based comparator for archive items"
   (string-greaterp (alist-get 'date a) (alist-get 'date b)))
 
-(defun pile-archive ()
+(defun pile-archive-format ()
   (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
-    (s-join "\n" (-map #'pile-archive-format (-sort #'pile-archive-comparator items)))))
+    (s-join "\n" (-map #'pile-archive-format-item (-sort #'pile-archive-comparator items)))))
 
-(defun pile-archive-regenerate-page (pj)
+(defun pile-archive-generate (pj)
   "Regenerate the index.org page for the blog type project."
   (let ((index-file (f-join (oref pj :input-dir) "index.org")))
     (when (f-exists-p index-file)
