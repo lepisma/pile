@@ -54,36 +54,34 @@
 </feed>"
   "Template for atom.xml file")
 
-(defun pile-atom-parse-item (pj item)
+(defun pile-atom-parse-archive-item (pj archive-item)
   "Create an ht for the ITEM generated from pile-archive."
-  (let* ((link (alist-get 'link item))
+  (let* ((link (alist-get 'link archive-item))
          (base-url-text (if (string-equal (oref pj :base-url) "") "" (file-name-as-directory (oref pj :base-url))))
          (new-link (concat (file-name-as-directory (oref pj :root-url))
                            base-url-text
                            (s-chop-prefix "./" (s-replace-regexp "\\.org$" ".html" link)))))
-    (setf (alist-get 'link item) new-link)
-    (let ((item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) item)))
-      (ht<-alist item))))
+    (setf (alist-get 'link archive-item) new-link)
+    (let ((archive-item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) archive-item)))
+      (ht<-alist archive-item))))
 
-(defun pile-atom-generate (pj)
+(defun pile-atom-format (pj)
   "Generate string representation of the feed for the project PJ."
   (when (eq (oref pj :type) 'blog)
     (let* ((default-directory (oref pj :input-dir))
-           (items (->> (pile-archive-parse)
-                     (-remove #'pile-archive-draft-p)
-                     (-sort #'pile-archive-comparator))))
+           (items (->> (pile-archive-parse) (-remove #'pile-archive-draft-p) (-sort #'pile-archive-comparator))))
       (mustache-render pile-atom-template
                        (ht ("root-author" (user-full-name))
                            ("root-title" (oref pj :name))
                            ("root-url" (concat (file-name-as-directory (oref pj :root-url))
                                                (oref pj :base-url)))
                            ("root-date" (format-time-string "%Y-%m-%d"))
-                           ("entry" (mapcar (-cut pile-atom-parse-item pj <>) items)))))))
+                           ("entry" (mapcar (-cut pile-atom-parse-archive-item pj <>) items)))))))
 
-(defun pile-atom-regenerate-page (pj)
+(defun pile-atom-generate (pj)
   "Regenerate atom.xml file for project PJ. Also copy the file in deploy
 directory."
-  (let ((text (pile-atom-generate pj))
+  (let ((text (pile-atom-format pj))
         (dirs (list (oref pj :input-dir) (oref pj :output-dir))))
     (when text
       (dolist (d dirs)

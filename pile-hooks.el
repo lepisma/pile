@@ -79,7 +79,7 @@ bc hook."
   (let ((pj (pile-get-project-from-file ifile)))
     (when (and (member (oref pj :type) '(blog))
                (s-ends-with-p ".html" ofile))
-      (pile-atom-regenerate-page pj))))
+      (pile-atom-generate pj))))
 
 (defun pile-hooks-post-clear-cids (ifile ofile)
   "Remove CUSTOM_ID related divs from the generated html."
