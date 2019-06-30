@@ -110,7 +110,7 @@ the relative path to issue page."
         (setq output (s-append (pile-index--format node root-dir (+ 1 (or level 0))) output))))
     output))
 
-(defun pile-index-generate ()
+(defun pile-index-format ()
   "Return string representation of the index tree. Call this in
 the index pages of wiki."
   (let ((index-tree (pile-index-parse default-directory)))
