@@ -109,7 +109,10 @@ bc hook."
     (pile-when-project-type pj '(blog)
       (when (and (s-ends-with-p ".html" ofile)
                  (not (pile-archive-page-p ifile)))
-        (pile-archive-generate pj)))))
+        (let ((index-file (f-join (oref pj :input-dir) "index.org")))
+          (when (f-exists? index-file)
+            (with-current-buffer (find-file-noselect index-file)
+              (pile-publish-current-file t))))))))
 
 (defun pile-hooks-post-generate-index (ifile _ofile)
   "Refresh indices for wiki tree on export. We keep walking up
