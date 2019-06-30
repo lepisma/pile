@@ -99,15 +99,6 @@ TODO: This is a mess. Some times I am working with a fname arg,
   (let ((pj (pile-get-project-from-file file-path)))
     (string= file-path (f-join (oref pj :input-dir) "index.org"))))
 
-;;;###autoload
-(defun pile-archive-regenerate ()
-  (interactive)
-  (helm :sources (helm-build-sync-source "Pile blog projects"
-                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter #'pile-blog-p pile-projects))
-                   :action #'pile-archive-regenerate-page)))
-
-
 (provide 'pile-archive)
 
 ;;; pile-archive.el ends here
