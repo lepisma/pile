@@ -94,7 +94,7 @@ bc hook."
 (defun pile-hooks-post-stringify-title (ifile ofile)
   "Make the title plain text in the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
-    (pile-when-project-type '(blog wiki plain)
+    (pile-when-project-type pj '(blog wiki plain)
       (when (s-ends-with-p ".html" ofile)
         (with-current-buffer (find-file-noselect ofile)
           (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
