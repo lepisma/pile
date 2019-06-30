@@ -80,12 +80,13 @@ TODO: This is a mess. Some times I am working with a fname arg,
             (alist-get 'title page-alist)
             (if tags (pile-tags-format-tags tags) ""))))
 
+(defun pile-archive-comparator (a b)
+  "Date based comparator for archive items"
+  (string-greaterp (alist-get 'date a) (alist-get 'date b)))
+
 (defun pile-archive ()
   (let ((items (-remove #'pile-archive-draft-p (pile-archive-parse))))
-    (s-join "\n" (-map #'pile-archive-format (-sort (lambda (a b)
-                                                      (string-lessp (alist-get 'date b)
-                                                                    (alist-get 'date a)))
-                                                    items)))))
+    (s-join "\n" (-map #'pile-archive-format (-sort #'pile-archive-comparator items)))))
 
 (defun pile-archive-regenerate-page (pj)
   "Regenerate the index.org page for the blog type project."

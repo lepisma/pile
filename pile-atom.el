@@ -71,7 +71,7 @@
     (let* ((default-directory (oref pj :input-dir))
            (items (->> (pile-archive-parse)
                      (-remove #'pile-archive-draft-p)
-                     (-sort (lambda (a b) (string-greaterp (alist-get 'date a) (alist-get 'date b)))))))
+                     (-sort #'pile-archive-comparator))))
       (mustache-render pile-atom-template
                        (ht ("root-author" (user-full-name))
                            ("root-title" (oref pj :name))
@@ -88,13 +88,6 @@ directory."
     (when text
       (dolist (d dirs)
         (f-write-text text 'utf-8 (f-join d "atom.xml"))))))
-
-(defun pile-atom-regenerate ()
-  (interactive)
-  (helm :sources (helm-build-sync-source "Pile blog projects"
-                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter #'pile-blog-p pile-projects))
-                   :action #'pile-atom-regenerate-page)))
 
 (provide 'pile-atom)
 
