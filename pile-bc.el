@@ -79,9 +79,9 @@
 
 (defun pile-bc-skip ()
   "Place point just after breadcrumb"
-  (pile--goto-top)
+  (goto-char (point-min))
   (re-search-forward "^#\\+HTML:<div id='breadcrumbs'>" nil t)
-  (goto-char (line-end-position)))
+  (end-of-line))
 
 (defun pile-bc-add ()
   "Function to insert breadcrumbs in the current file."
