@@ -38,16 +38,21 @@
                       (f-parent path))))
     (s-replace "/" "-" (substring date-path -10))))
 
+(defun pile-date-added? ()
+  (goto-char (point-min))
+  (re-search-forward "^#\\+DATE:" nil t))
+
 (defun pile-date-add ()
   "Function to insert date information in the exported file"
-  (let* ((fname (buffer-file-name))
-         (pj (pile-get-project-from-file fname)))
-    (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
-      (goto-char 1)
-      (search-forward "#+TITLE:")
-      (goto-char (line-end-position))
-      (insert "\n")
-      (insert (format "#+DATE: <%s>" (pile-date-parse-date))))))
+  (unless (pile-date-added?)
+    (let* ((fname (buffer-file-name))
+           (pj (pile-get-project-from-file fname)))
+      (unless (string-equal fname (f-join (oref pj :input-dir) "index.org"))
+        (goto-char 1)
+        (search-forward "#+TITLE:")
+        (goto-char (line-end-position))
+        (insert "\n")
+        (insert (format "#+DATE: <%s>" (pile-date-parse-date)))))))
 
 (provide 'pile-date)
 
