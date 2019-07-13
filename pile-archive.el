@@ -30,7 +30,6 @@
 (require 'f)
 (require 'helm)
 (require 'pile-base)
-(require 'pile-blog)
 (require 'pile-date)
 (require 'pile-tags)
 (require 'pile-utils)

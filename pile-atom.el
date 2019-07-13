@@ -34,7 +34,6 @@
 (require 'mustache)
 (require 'pile-base)
 (require 'pile-archive)
-(require 'pile-blog)
 (require 'pile-path)
 (require 's)
 
