@@ -98,8 +98,8 @@ cleanup of old-paths remnants."
          (movable (pile-archive-movable post))
          (input-path (f-join (oref pj :input-dir) movable))
          (publish-path (f-join (oref pj :output-dir) movable)))
-    (f-copy input-path (pile-blog-swap-date-path input-path new-date-string))
-    (f-copy publish-path (pile-blog-swap-date-path publish-path new-date-string))
+    (copy-directory input-path (pile-blog-swap-date-path input-path new-date-string) nil t t)
+    (copy-directory publish-path (pile-blog-swap-date-path publish-path new-date-string) nil t t)
     (pile-blog-delete-post pj post)))
 
 (defun pile-blog-delete-post (pj post)
