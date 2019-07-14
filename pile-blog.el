@@ -32,6 +32,7 @@
 (require 'helm)
 (require 'pile-base)
 (require 'pile-utils)
+(require 'pile-archive)
 (require 's)
 
 
@@ -51,15 +52,27 @@
   "Tell if the project is a valid blog"
   (f-exists-p (f-join (oref pj :input-dir) "index.org")))
 
+(defun pile-blog--choose-project (&optional helm-buffer-name)
+  "Return a blog project using helm selector."
+  (helm :sources (helm-build-sync-source "Pile blog projects"
+                   :candidates (-map (lambda (pj) (cons (oref pj :name) pj))
+                                     (-filter (lambda (pj) (and (pile-project-blog-p pj) (pile-blog-valid? pj))) pile-projects)))
+        :buffer (or helm-buffer-name "*helm pile blog*")))
+
+(cl-defmethod pile-blog--choose-post ((pj pile-project-blog) &optional helm-buffer-name)
+  "Return a post from the blog using a helm selector."
+  (let* ((default-directory (oref pj :input-dir))
+         (items (->> (pile-archive-parse) (-sort #'pile-archive-comparator))))
+    (helm :sources (helm-build-sync-source "Posts"
+                     :candidates (-map (lambda (post) (cons (alist-get 'title post) post)) items))
+          :buffer (or helm-buffer-name "*helm pile posts*"))))
+
 ;;;###autoload
 (defun pile-blog-new-post ()
   "Create a new post based on current date."
   (interactive)
-  (helm :sources (helm-build-sync-source "Pile blog projects"
-                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj))
-                                       (-filter (lambda (pj) (and (pile-project-blog-p pj) (pile-blog-valid? pj))) pile-projects))
-                   :action (lambda (pj) (find-file (pile-blog--create-post pj (read-string "Post name: ")))))
-        :buffer "*helm pile blog new post*"))
+  (let ((pj (pile-blog--choose-project "*helm pile blog new post*")))
+    (find-file (pile-blog--create-post pj (read-string "Post name: ")))))
 
 (defun pile-blog-refile-post (post)
   "Move this post to a new blog"
