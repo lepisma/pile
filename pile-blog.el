@@ -78,13 +78,49 @@
   "Move this post to a new blog"
   (user-error "Not implemented"))
 
-(defun pile-blog-redate-post (post)
-  "Change the date of current post"
-  (user-error "Not implemented"))
+(defun pile-blog-swap-date-path (old-path new-date-string)
+  "`new-date-string' is in YYYY-MM-DD format."
+  (cl-destructuring-bind (year month date) (s-split "-" new-date-string)
+    (when (string-match "\\([0-9]\\{4\\}\\)/\\([0-9]\\{2\\}\\)/\\([0-9]\\{2\\}\\)"  old-path)
+      (-reduce-from (lambda (string repl-args)
+                      (replace-match (car repl-args) nil nil string (cdr repl-args)))
+                    old-path
+                    `((,year . 1) (,month . 2) (,date . 3))))))
 
-(defun pile-blog-delete-post (post &optional delete-deployed)
-  "Delete a post and its related files, optionally also delete the deployed page."
-  (user-error "Not implemented"))
+(defun pile-blog-redate-post ()
+  "Change the date of current post. This involves moving the item
+from its current place both in source and deployment path. Also
+cleanup of old-paths remnants."
+  (interactive)
+  (let* ((pj (pile-blog--choose-project "*helm pile blog redate post*"))
+         (post (pile-blog--choose-post pj))
+         (new-date-string (org-read-date nil nil nil "New Date:"))
+         (movable (pile-archive-movable post))
+         (input-path (f-join (oref pj :input-dir) movable))
+         (publish-path (f-join (oref pj :output-dir) movable)))
+    (f-copy input-path (pile-blog-swap-date-path input-path new-date-string))
+    (f-copy publish-path (pile-blog-swap-date-path publish-path new-date-string))
+    (pile-blog-delete-post pj post)))
+
+(defun pile-blog-delete-post (pj post)
+  "Delete a post and its related files. also delete the deployed
+page.
+
+You will also need to regenerate feeds if you have the hooks
+setup. We are not doing this here because it's a publish type
+hook (maybe we need a structure change hook?) and also because
+the effect won't be missed since any other publish will update
+the feeds."
+  (interactive (let ((pj (pile-blog--choose-project "*helm pile blog delete post*")))
+                 (list pj (pile-blog--choose-post pj))))
+  (let* ((movable (pile-archive-movable post))
+         (input-path (f-join (oref pj :input-dir) movable))
+         (publish-path (f-join (oref pj :output-dir) movable)))
+    (f-delete input-path t)
+    (pile-clean-up-parents input-path)
+    (when (f-exists? publish-path)
+      (f-delete publish-path t)
+      (pile-clean-up-parents publish-path))))
 
 (provide 'pile-blog)
 

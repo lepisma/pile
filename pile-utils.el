@@ -63,6 +63,14 @@
   "Return project from file-name"
   (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) file-name)) pile-projects))
 
+(defun pile-clean-up-parents (path)
+  "Delete parent directories for the given path if they are all
+empty."
+  (let ((parent (f-parent path)))
+    (when (f-empty? parent)
+      (f-delete parent)
+      (pile-clean-up-parents parent))))
+
 (defun pile-get-project (name)
   "Get project by name"
   (-find (lambda (pj) (string-equal name (oref pj :name))) pile-projects))

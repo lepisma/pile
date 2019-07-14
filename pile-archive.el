@@ -37,7 +37,10 @@
 (defun pile-archive-parse ()
   "Parse the list of pages from the current root directory.
 TODO: This is a mess. Some times I am working with a fname arg,
-      other times with (current?) buffer."
+      other times with (current?) buffer.
+
+TODO: Make this a method in pile-project-blog. Might need to
+      check what gets affected in the website repo."
   (let ((org-files (-map (lambda (pr)
                            (if (not (s-ends-with? ".org" pr))
                                (f-join pr "index.org")
@@ -56,6 +59,17 @@ TODO: This is a mess. Some times I am working with a fname arg,
 
 (defun pile-archive-draft-p (item)
   (alist-get 'draft item))
+
+(defun pile-archive-movable (item)
+  "Return movable for the item. In case of single page post, it's
+only a single file. For a directory post, return the directory.
+
+Notice that the output path here is relative and you need to
+attach it to a valid root to get either the source or the
+deployment path."
+  (if (s-ends-with? "index.org" (alist-get 'link item))
+      (f-parent (alist-get 'link item))
+    (alist-get 'link item)))
 
 (defun pile-archive-unique-tags (items)
   "Parse unique tags from the page items"
