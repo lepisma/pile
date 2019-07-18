@@ -12,7 +12,7 @@ echo " node [shape=component, color=\"#cccccc\", fontname=monospace, fontcolor=\
 
 set int_modules
 
-for f in *.el
+for f in **.el
     set mod (cat $f | string match -r "\(provide \'(.+)\)")[2]
     if test -n "$mod"
         echo " \"$mod\" [color=\"#333333\", fontcolor=\"#333333\"];" >> $dot_file
@@ -20,7 +20,7 @@ for f in *.el
     end
 end
 
-for f in *.el
+for f in **.el
     set mod (cat $f | string match -r "\(provide \'(.+)\)")[2]
     if test -n "$mod"
         for dep in (cat $f | string match -r "\(require \'(.+)\)")
