@@ -12,9 +12,9 @@ set links (printf '%s\n' $links | sort -u)
 function check_link
     switch (curl -s -o /dev/null -w "%{http_code}" $argv[1] --max-time 30)
         case 404
-            echo "[x] $argv[1]" 1>&2
+            echo $argv[1] 1>&2
         case 100
-            echo "[x] $argv[1]" 1>&2
+            echo $argv[1] 1>&2
     end
 end
 
