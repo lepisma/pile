@@ -31,6 +31,24 @@
 (require 'f)
 (require 's)
 
+(defmacro pile-temp-open (filename &rest body)
+  "Temporary open a file and work there. When done, keep the file
+open if we had it already open, else close."
+  (declare (indent defun))
+  (let ((old-buffer (gensym "buf"))
+        (new-buffer (gensym "buf")))
+    `(let ((,old-buffer (find-buffer-visiting ,filename)))
+       (if ,old-buffer
+           (with-current-buffer ,old-buffer
+             ,@body)
+         (let ((,new-buffer (find-file-noselect ,filename)))
+           (condition-case err
+               (prog1
+                   (with-current-buffer ,new-buffer
+                     ,@body)
+                 (kill-buffer ,new-buffer))
+             (error (progn (kill-buffer ,new-buffer) (signal (car err) (cdr err))))))))))
+
 (defun pile--name-to-id (name)
   (s-replace-all '((" " . "-")) (downcase (s-collapse-whitespace (s-trim name)))))
 
