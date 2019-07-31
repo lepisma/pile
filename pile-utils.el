@@ -42,12 +42,10 @@ open if we had it already open, else close."
            (with-current-buffer ,old-buffer
              ,@body)
          (let ((,new-buffer (find-file-noselect ,filename)))
-           (condition-case err
-               (prog1
-                   (with-current-buffer ,new-buffer
-                     ,@body)
-                 (kill-buffer ,new-buffer))
-             (error (progn (kill-buffer ,new-buffer) (signal (car err) (cdr err))))))))))
+           (unwind-protect
+             (with-current-buffer ,new-buffer
+               ,@body)
+             (kill-buffer ,new-buffer)))))))
 
 (defun pile--name-to-id (name)
   (s-replace-all '((" " . "-")) (downcase (s-collapse-whitespace (s-trim name)))))
@@ -136,9 +134,9 @@ empty."
                          (dolist (hook pile-post-publish-hook)
                            (remove-hook 'org-publish-after-publishing-hook hook)))))
     `(let ((pre-hooks (eval (pile-make-pre-hooks-form))))
-       (condition-case err
-           (progn ,@add-forms ,@body ,@remove-forms)
-         (error (progn ,@remove-forms (signal (car err) (cdr err))))))))
+       (unwind-protect
+           (progn ,@add-forms ,@body)
+         (progn ,@remove-forms)))))
 
 (defmacro pile-when-project-type (pj project-types &rest body)
   "Run body form when given project is one of the types."
