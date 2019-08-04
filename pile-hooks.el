@@ -86,23 +86,21 @@ bc hook."
   (let ((pj (pile-get-project-from-file ifile)))
     (pile-when-project-type pj '(blog wiki plain)
       (when (s-ends-with-p ".html" ofile)
-        (with-current-buffer (find-file-noselect ofile)
+        (pile-temp-open ofile
           (pile-cids-clear-html)
-          (if (buffer-modified-p) (save-buffer))
-          (kill-buffer))))))
+          (if (buffer-modified-p) (save-buffer)))))))
 
 (defun pile-hooks-post-stringify-title (ifile ofile)
   "Make the title plain text in the generated html."
   (let ((pj (pile-get-project-from-file ifile)))
     (pile-when-project-type pj '(blog wiki plain)
       (when (s-ends-with-p ".html" ofile)
-        (with-current-buffer (find-file-noselect ofile)
+        (pile-temp-open ofile
           (goto-char (point-min))
           (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
             (let ((old-title (match-string-no-properties 1)))
               (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
-          (if (buffer-modified-p) (save-buffer))
-          (kill-buffer))))))
+          (if (buffer-modified-p) (save-buffer)))))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
@@ -112,7 +110,7 @@ bc hook."
                  (not (pile-archive-page-p ifile)))
         (let ((index-file (f-join (oref pj :input-dir) "index.org")))
           (when (f-exists? index-file)
-            (with-current-buffer (find-file-noselect index-file)
+            (pile-temp-open index-file
               (pile-publish-current-file t))))))))
 
 (defun pile-hooks-post-generate-index (ifile _ofile)
@@ -124,7 +122,7 @@ the hierarchy starting from ifile and regenerate all the pages involved."
                                    (f-join (f-parent (f-parent ifile)) "index.org")
                                  (f-join (f-parent ifile) "index.org"))))
         (when (f-exists? parent-index-file)
-          (with-current-buffer (find-file-noselect parent-index-file)
+          (pile-temp-open parent-index-file
             (pile-publish-current-file t)))))))
 
 (provide 'pile-hooks)
