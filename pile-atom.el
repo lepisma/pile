@@ -75,7 +75,7 @@
                          ("root-title" (oref pj :name))
                          ("root-url" (concat (file-name-as-directory (oref pj :root-url))
                                              (oref pj :base-url)))
-                         ("root-date" (format-time-string "%Y-%m-%d"))
+                         ("root-date" (format-time-string "%FT%T%z"))
                          ("entry" (mapcar (-cut pile-atom-parse-archive-item pj <>) items))))))
 
 (cl-defmethod pile-atom-generate ((pj pile-project-blog))
