@@ -41,6 +41,7 @@
 <feed xmlns=\"http://www.w3.org/2005/Atom\">
   <title>{{ root-title }}</title>
   <link href=\"{{ root-url }}\"/>
+  <link href=\"{{ root-url }}/atom.xml\" rel=\"self\"/>
   <updated>{{ root-date }}</updated>
   <author><name>{{ root-author }}</name></author>
 
