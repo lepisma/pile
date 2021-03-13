@@ -49,6 +49,7 @@
 (require 'pile-ref)
 (require 'pile-atom)
 (require 'pile-hooks)
+(require 'pile-wiki)
 (require 'org)
 (require 'ox-html)
 (require 'ox-publish)
