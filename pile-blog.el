@@ -59,14 +59,6 @@
                                      (-filter (lambda (pj) (and (pile-project-blog-p pj) (pile-blog-valid? pj))) pile-projects)))
         :buffer (or helm-buffer-name "*helm pile blog*")))
 
-(cl-defmethod pile-blog--choose-post ((pj pile-project-blog) &optional helm-buffer-name)
-  "Return a post from the blog using a helm selector."
-  (let* ((default-directory (oref pj :input-dir))
-         (items (->> (pile-archive-parse) (-sort #'pile-archive-comparator))))
-    (helm :sources (helm-build-sync-source "Posts"
-                     :candidates (-map (lambda (post) (cons (alist-get 'title post) post)) items))
-          :buffer (or helm-buffer-name "*helm pile posts*"))))
-
 ;;;###autoload
 (defun pile-blog-new-post ()
   "Create a new post based on current date."
@@ -74,9 +66,30 @@
   (let ((pj (pile-blog--choose-project "*helm pile blog new post*")))
     (find-file (pile-blog--create-post pj (read-string "Post name: ")))))
 
-(defun pile-blog-refile-post (post)
-  "Move this post to a new blog"
-  (user-error "Not implemented"))
+;;;###autoload
+(defun pile-blog ()
+  "Perform various acts on pile-blog posts."
+  (interactive)
+  (let* ((pj (pile-blog--choose-project))
+         (default-directory (oref pj :input-dir))
+         (items (->> (pile-archive-parse) (-sort #'pile-archive-comparator))))
+    (helm :sources (helm-build-sync-source "Posts"
+                     :candidates (-map (lambda (post) (cons (alist-get 'title post) post)) items)
+                     :action `(("Open post" . (lambda (post) (pile-blog-open-post ,pj post)))
+                               ("Insert link" . (lambda (post) (pile-blog-insert-link ,pj post)))
+                               ("Delete post" . (lambda (post) (pile-blog-delete-post ,pj post)))
+                               ("Redate post" . (lambda (post) (pile-blog-redate-post ,pj post)))))
+          :buffer "*helm pile posts*")))
+
+(defun pile-blog-open-post (pj post)
+  "Open POST for editing."
+  (find-file (f-join (oref pj :input-dir) (alist-get 'link post))))
+
+(defun pile-blog-insert-link (pj post)
+  "Insert Org Mode style pile link for given POST."
+  (let ((link-name (read-from-minibuffer "Link name: " (alist-get 'title post))))
+    (insert (format "[[pile:%s:%s][%s]]"
+                    (oref pj :name) (alist-get 'link post) link-name))))
 
 (defun pile-blog-swap-date-path (old-path new-date-string)
   "`new-date-string' is in YYYY-MM-DD format."
@@ -87,14 +100,11 @@
                     old-path
                     `((,year . 1) (,month . 2) (,date . 3))))))
 
-(defun pile-blog-redate-post ()
+(defun pile-blog-redate-post (pj post)
   "Change the date of current post. This involves moving the item
 from its current place both in source and deployment path. Also
 cleanup of old-paths remnants."
-  (interactive)
-  (let* ((pj (pile-blog--choose-project "*helm pile blog redate post*"))
-         (post (pile-blog--choose-post pj))
-         (new-date-string (org-read-date nil nil nil "New Date:"))
+  (let* ((new-date-string (org-read-date nil nil nil "New Date:"))
          (movable (pile-archive-movable post))
          (input-path (f-join (oref pj :input-dir) movable))
          (publish-path (f-join (oref pj :output-dir) movable)))
@@ -111,8 +121,6 @@ setup. We are not doing this here because it's a publish type
 hook (maybe we need a structure change hook?) and also because
 the effect won't be missed since any other publish will update
 the feeds."
-  (interactive (let ((pj (pile-blog--choose-project "*helm pile blog delete post*")))
-                 (list pj (pile-blog--choose-post pj))))
   (let* ((movable (pile-archive-movable post))
          (input-path (f-join (oref pj :input-dir) movable))
          (publish-path (f-join (oref pj :output-dir) movable)))
