@@ -13,3 +13,13 @@ kind of embellishments the pages get using a bunch of hooks and/or org level
 config using the ~org-export~ and ~org-publish~ infrastructure.
 
 Overall this setup is sometimes annoying and slow but works mostly okay for me.
+
+* Workflow Notes
+** Hooks
+There are two hooks that work with the ~pile-publish-~ functions. See
+~./pile-hook.el~ for example functions.
+
+1. ~pile-pre-publish-hook~. Functions here run in the to-be-published Org mode
+   buffer and don't take any argument.
+2. ~pile-post-publish-hook~. These take input (Org) file path and output file path
+   (HTML).
