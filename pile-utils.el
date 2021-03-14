@@ -58,7 +58,7 @@ open if we had it already open, else close."
              (not (s-starts-with? "#+begin" (downcase line-text)))))))
 
 (defun pile--file-title (file)
-  "Return title for an org file"
+  "Return title for an org FILE."
   (with-temp-buffer
     (insert-file-contents file nil nil 1000)
     (goto-char (point-min))
