@@ -75,9 +75,18 @@ open if we had it already open, else close."
         (insert "\n"))
     (signal 'error (format "SETUPFILE line not found in %s." buffer-file-name))))
 
-(defun pile-get-project-from-file (file-name)
-  "Return project from file-name"
-  (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) file-name)) pile-projects))
+(defun pile-get-project-from-file (file)
+  "Return project from FILE."
+  (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) file)) pile-projects))
+
+(defun pile-get-static-items (file)
+  "Return static items for accompanying FILE. FILE can be Org
+mode (input) or HTML file (output)."
+  (let ((parent (f-parent file)))
+    (->> (f-entries parent)
+       (-remove (lambda (entry) (s-matches? "\\.\\(org\\|html\\)$" entry)))
+       (-remove (lambda (entry) (and (f-dir? entry) (or (f-exists? (f-join entry "index.org")))
+                                                   (f-exists? (f-join entry "index.html"))))))))
 
 (defun pile-clean-up-parents (path)
   "Delete parent directories for the given path if they are all
