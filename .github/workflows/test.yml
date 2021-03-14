@@ -1,0 +1,21 @@
+name: "Test"
+on:
+  push:
+    branches:
+      master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: purcell/setup-emacs@master
+        with:
+          version: 27.1
+      - name: Install Cask
+        run: |
+          git clone https://github.com/cask/cask ~/.cask
+          echo "$HOME/.cask/bin" >> $GITHUB_PATH
+      - name: Setup dependencies
+        run: cask install
+      - name: Test
+        run: cask exec buttercup -L .
