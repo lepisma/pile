@@ -85,8 +85,9 @@ mode (input) or HTML file (output)."
   (let ((parent (f-parent file)))
     (->> (f-entries parent)
        (-remove (lambda (entry) (s-matches? "\\.\\(org\\|html\\)$" entry)))
-       (-remove (lambda (entry) (and (f-dir? entry) (or (f-exists? (f-join entry "index.org")))
-                                                   (f-exists? (f-join entry "index.html"))))))))
+       (-remove (lambda (entry) (and (f-dir? entry))
+                                (or (f-exists? (f-join entry "index.org"))
+                                    (f-exists? (f-join entry "index.html"))))))))
 
 (defun pile-clean-up-parents (path)
   "Delete parent directories for the given path if they are all

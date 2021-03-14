@@ -111,7 +111,7 @@ directory."
   ;; Then copy over items from input to output.
   (let ((output-dir (f-parent ofile)))
     (dolist (entry (pile-get-static-items ifile))
-      (f-copy entry output-dir))))
+      (f-copy entry (file-name-as-directory output-dir)))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
