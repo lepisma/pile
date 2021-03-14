@@ -102,6 +102,17 @@ bc hook."
               (replace-match (s-replace-regexp "<.*?>" "" old-title) nil nil nil 1)))
           (if (buffer-modified-p) (save-buffer)))))))
 
+(defun pile-hooks-post-sync-static-files (ifile ofile)
+  "Sync static files (non-org) from input directory to output
+directory."
+  ;; First we delete all items from output directory.
+  (dolist (entry (pile-get-static-items ofile))
+    (f-delete entry t))
+  ;; Then copy over items from input to output.
+  (let ((output-dir (f-parent ofile)))
+    (dolist (entry (pile-get-static-items ifile))
+      (f-copy entry output-dir))))
+
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
   (let ((pj (pile-get-project-from-file ifile)))
