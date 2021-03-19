@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'dash)
 (require 'dash-functional)
 (require 'f)
