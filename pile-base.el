@@ -35,6 +35,7 @@
          :type string
          :documentation "Name for the project")
    (root-url :initarg :root-url
+             :initform ""
              :type string
              :documentation "Url for the deployed site")
    (base-url :initarg :base-url
@@ -47,9 +48,11 @@
                :type string
                :documentation "Output directory for the project")
    (postamble :initarg :postamble
+              :initform ""
               :type string
               :documentation "Postamble for the pages")
    (preamble :initarg :preamble
+             :initform ""
              :type string
              :documentation "Preamble for the pages"))
   :abstract t

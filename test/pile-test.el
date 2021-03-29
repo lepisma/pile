@@ -45,11 +45,8 @@
   (before-all
     (setq pile-output-dir (f-join temporary-file-directory (make-temp-name "pile-test-")))
     (setq pile-projects (list (pile-project-wiki :name "test-wiki"
-                                                 :root-url ""
                                                  :input-dir "./test/test-input/wiki"
-                                                 :output-dir (f-join pile-output-dir "wiki")
-                                                 :preamble ""
-                                                 :postamble ""))))
+                                                 :output-dir (f-join pile-output-dir "wiki")))))
 
   (after-all
     (f-delete pile-output-dir t))
