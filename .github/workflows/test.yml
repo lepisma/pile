@@ -7,14 +7,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        check:
-          - melpa
-          - load-file
-          - byte-compile
-          - checkdoc
-          - package-lint
     steps:
       - uses: actions/checkout@v2
       - uses: purcell/setup-emacs@master
@@ -28,7 +20,3 @@ jobs:
         run: cask install
       - name: Test
         run: cask exec buttercup -L .
-      - uses: leotaku/elisp-check@master
-        with:
-          check: ${{ matrix.check }}
-          file: "*.el"
