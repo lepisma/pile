@@ -3,7 +3,7 @@
 ;; Copyright (c) 2018 Abhinav Tushar
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
-;; Version: 0.5.0
+;; Version: 0.5.1
 ;; Package-Requires: ((emacs "25") (dash "2.18.0") (f "0.20.0") (s "1.12.0") (mustache "0.24") (ht "2.2"))
 ;; URL: https://github.com/lepisma/pile
 
