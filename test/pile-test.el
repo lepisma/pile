@@ -1,9 +1,12 @@
+;; -*- lexical-binding: t -*-
+
 (push "test" load-path)
 (require 'test-utils)
 
 (require 'f)
 (require 'pile-tags)
 (require 'pile-utils)
+(require 'pile)
 
 (describe "Option parsing"
   (it "works"
@@ -35,3 +38,24 @@
        "#+titLe: this is the title"
        (pile--file-title fname))
      :to-equal "this is the title")))
+
+(describe "Publishing"
+  :var (pile-output-dir)
+
+  (before-all
+    (setq pile-output-dir (f-join temporary-file-directory (make-temp-name "pile-test-")))
+    (setq pile-projects (list (pile-project-wiki :name "test-wiki"
+                                                 :root-url ""
+                                                 :input-dir "./test/test-input/wiki"
+                                                 :output-dir (f-join pile-output-dir "wiki")
+                                                 :preamble ""
+                                                 :postamble ""))))
+
+  (after-all
+    (f-delete pile-output-dir t))
+
+  (it "works for dummy wiki project"
+    (pile-setup)
+    (mkdir (f-join pile-output-dir "wiki") t)
+    (expect (pile-project-publish (car pile-projects) t) :not :to-throw)
+    (expect (f-entries (f-join pile-output-dir "wiki")) :to-have-same-items-as (list (f-join pile-output-dir "wiki" "index.html")))))
