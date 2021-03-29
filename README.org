@@ -19,7 +19,7 @@ Overall this setup is sometimes annoying and slow but works mostly okay for me.
 There are two hooks that work with the ~pile-publish-~ functions. See
 ~./pile-hook.el~ for example functions.
 
-1. ~pile-pre-publish-hook~. Functions here run in the to-be-published Org mode
-   buffer and don't take any argument.
-2. ~pile-post-publish-hook~. These take input (Org) file path and output file path
-   (HTML).
+1. ~pile-pre-publish-hook~. Functions here are added to
+   ~org-export-before-parsing-hook~ and run in the /to-be-published/ Org mode
+   buffer.
+2. ~pile-post-publish-hook~. These are added to ~org-publish-after-publishing-hook~.

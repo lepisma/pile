@@ -35,12 +35,12 @@
 (require 'pile-utils)
 (require 's)
 
-(defun pile-hooks-pre-add-bc ()
+(defun pile-hooks-pre-add-bc (_export-backend)
   "Add breadcrumbs to the wiki files."
   (pile-when-type '(wiki)
     (pile-bc-add)))
 
-(defun pile-hooks-pre-add-crosslinks ()
+(defun pile-hooks-pre-add-crosslinks (_export-backend)
   "Add cross links for given page. This needs to be called after
 bc hook."
   ;; TODO: Move this somewhere safe
@@ -54,22 +54,22 @@ bc hook."
             (push issue-link links))
         (insert (format "#+HTML:<div id='crosslinks'>%s</div>" (s-join " " links)))))))
 
-(defun pile-hooks-pre-add-cids ()
+(defun pile-hooks-pre-add-cids (_export-backend)
   "Add cids in the org file."
   (pile-when-type '(blog wiki plain)
     (pile-cids-add-all)))
 
-(defun pile-hooks-pre-add-date ()
+(defun pile-hooks-pre-add-date (_export-backend)
   "Add date to org file for blog projects."
   (pile-when-type '(blog)
     (pile-date-add)))
 
-(defun pile-hooks-pre-add-dropcap ()
+(defun pile-hooks-pre-add-dropcap (_export-backend)
   "Add dropcaps."
   (pile-when-type '(blog plain)
     (pile-dropcap-add)))
 
-(defun pile-hooks-pre-add-tags ()
+(defun pile-hooks-pre-add-tags (_export-backend)
   "Add list of formatted tags to the buffer."
   (pile-when-type '(blog)
     (pile-tags-add)))

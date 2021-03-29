@@ -26,7 +26,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'dash)
 (require 'dash-functional)
 (require 'f)
@@ -123,31 +122,20 @@ empty."
        (-filter #'f-exists?)
        (-map #'f-delete))))
 
-(defun pile-make-pre-hooks-form ()
-  "Make org-export style hooks from pile hooks and return the symbol list."
-  (let ((fn-names (loop for i from 1 to (length pile-pre-publish-hook) collect (gensym "pile-hook-fn"))))
-    `(progn
-       ,@(loop for fn in pile-pre-publish-hook
-               for fn-name in fn-names
-               collect `(defun ,fn-name (_export-backend)
-                          (funcall ',fn)))
-       ',fn-names)))
-
 (defmacro with-pile-hooks (&rest body)
-  "Run body with pile related export hooks set."
-  (let* ((add-forms `((dolist (hook pre-hooks)
-                        (add-hook 'org-export-before-parsing-hook hook t))
-                      (dolist (hook pile-post-publish-hook)
-                        (add-hook 'org-publish-after-publishing-hook hook t))))
-         (remove-forms `((dolist (hook pre-hooks)
-                           (remove-hook 'org-export-before-parsing-hook hook)
-                           (unintern hook nil))
-                         (dolist (hook pile-post-publish-hook)
-                           (remove-hook 'org-publish-after-publishing-hook hook)))))
-    `(let ((pre-hooks (eval (pile-make-pre-hooks-form))))
-       (unwind-protect
-           (progn ,@add-forms ,@body)
-         (progn ,@remove-forms)))))
+  "Run body with pile related export hooks set up. Hooks are
+removed after execution."
+    `(unwind-protect
+         (progn
+           (dolist (hook pile-pre-publish-hook)
+             (add-hook 'org-export-before-parsing-hook hook t))
+           (dolist (hook pile-post-publish-hook)
+             (add-hook 'org-publish-after-publishing-hook hook t))
+           ,@body)
+       (dolist (hook pile-pre-publish-hook)
+         (remove-hook 'org-export-before-parsing-hook hook))
+       (dolist (hook pile-post-publish-hook)
+         (remove-hook 'org-publish-after-publishing-hook hook))))
 
 (defmacro pile-when-project-type (pj project-types &rest body)
   "Run body form when given project is one of the types."
