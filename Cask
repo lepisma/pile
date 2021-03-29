@@ -2,7 +2,6 @@
 (source org)
 
 (depends-on "dash")
-(depends-on "dash-functional")
 (depends-on "f")
 (depends-on "ht")
 (depends-on "mustache")
