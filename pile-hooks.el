@@ -107,12 +107,14 @@ bc hook."
   "Sync static files (non-org) from input directory to output
 directory."
   ;; First we delete all items from output directory.
-  (dolist (entry (pile-get-static-items ofile))
-    (f-delete entry t))
-  ;; Then copy over items from input to output.
-  (let ((output-dir (f-parent ofile)))
-    (dolist (entry (pile-get-static-items ifile))
-      (f-copy entry (file-name-as-directory output-dir)))))
+  (let ((pj (pile-get-project-from-file ifile)))
+    (pile-when-project-type pj (wiki)
+      (dolist (entry (pile-get-static-items ofile))
+        (f-delete entry t))
+      ;; Then copy over items from input to output.
+      (let ((output-dir (f-parent ofile)))
+        (dolist (entry (pile-get-static-items ifile))
+          (f-copy entry (file-name-as-directory output-dir)))))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
