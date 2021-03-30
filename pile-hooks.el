@@ -109,6 +109,7 @@ directory."
   ;; First we delete all items from output directory.
   (let ((pj (pile-get-project-from-file ifile)))
     (pile-when-project-type pj (wiki)
+      ;; TODO: Activate this for blog
       (dolist (entry (pile-get-static-items ofile))
         (f-delete entry t))
       ;; Then copy over items from input to output.
