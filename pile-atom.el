@@ -75,7 +75,7 @@
                          ("root-url" (concat (file-name-as-directory (oref pj :root-url))
                                              (oref pj :base-url)))
                          ("root-date" (format-time-string "%FT%T%z"))
-                         ("entry" (mapcar (-cut pile-atom-parse-archive-item pj <>) items))))))
+                         ("entry" (mapcar (lambda (it) (pile-atom-parse-archive-item pj it)) items))))))
 
 (cl-defmethod pile-atom-generate ((pj pile-project-blog))
   "Regenerate atom.xml file for project PJ. Also copy the file in deploy
