@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'pile-atom)
 (require 'pile-bc)
 (require 'pile-cids)
 (require 'pile-date)
