@@ -25,8 +25,8 @@ There are two hooks that work with the ~pile-publish-~ functions. See
 2. ~pile-post-publish-hook~. These are added to ~org-publish-after-publishing-hook~.
 
 ** Configuration
-The overall effect on my website is strongly tied to the following two
-components:
+The overall effect on my website is strongly tied to the following components:
 
 1. Org Export configuration [[https://github.com/lepisma/lepisma.github.io/blob/source/assets/export.setup][here]].
 2. The CSS theme for various HTML components on the page, kept [[https://github.com/lepisma/pile-theme][here]].
+3. Package configuration [[https://github.com/lepisma/rogue/blob/9eda54718029973e6b665cfcc98e50d1a9d2c424/packages.el#L206][here]].
