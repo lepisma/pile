@@ -99,16 +99,11 @@ These functions are directly appended to org-publish-after-publishing-hook."
                    :action (lambda (pj) (pile-project-publish pj arg)))
         :buffer "*helm pile publish*"))
 
-(defun pile-export-setup ()
-  "A few custom org-export settings"
-  (setq org-export-with-tags 'not-in-toc))
-
 ;;;###autoload
 (defun pile-setup ()
   "Setup for pile"
   (let ((project-configs (mapcar #'pile-project-config pile-projects)))
     (setq org-publish-project-alist (apply #'append org-publish-project-alist project-configs)))
-  (pile-export-setup)
   (pile-ref-setup))
 
 (provide 'pile)
