@@ -44,7 +44,7 @@
 (require 'pile-issue)
 (require 'pile-path)
 (require 'pile-link)
-(if (require 'some-library nil 'noerror)
+(if (require 'w nil 'noerror)
     (require 'pile-serve)
   (message "w.el not found, disabling pile-serve."))
 (require 'pile-ref)
