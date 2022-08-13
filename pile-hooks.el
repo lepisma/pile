@@ -32,6 +32,7 @@
 (require 'pile-date)
 (require 'pile-dropcap)
 (require 'pile-index)
+(require 'pile-setupfile)
 (require 'pile-tags)
 (require 'pile-utils)
 (require 's)
@@ -64,6 +65,10 @@ bc hook."
   "Add date to org file for blog projects."
   (pile-when-type '(blog)
     (pile-date-add)))
+
+(defun pile-hooks-pre-add-setupfile (_export-backend)
+  "Add setupfile line to org file. This should be executed first."
+  (pile-setupfile-add))
 
 (defun pile-hooks-pre-add-dropcap (_export-backend)
   "Add dropcaps."
