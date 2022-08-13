@@ -54,7 +54,14 @@
    (preamble :initarg :preamble
              :initform ""
              :type string
-             :documentation "Preamble for the pages"))
+             :documentation "Preamble for the pages")
+   (setupfile :initarg :setupfile
+              :initform ""
+              :type string
+              :documentation "Path to the setup file for
+              inclusion before exporting. The SETUP happens just
+              after TITLE and so your can do overrides as
+              needed."))
   :abstract t
   :documentation "Base project type for pile")
 
