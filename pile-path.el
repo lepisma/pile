@@ -37,7 +37,7 @@
 ;;            Example /home/lepisma/something.type
 ;; rel-path : Relative path of the file. Needs a project to get the root-dir.
 ;;            For example 2018/02/02/main.org
-;; pile-path: Pile formatted path <project-name>:<rel-path>
+;; pile-path: Pile formatted path <project-name>:<rel-path>[::<internal-path>]
 ;;            For example wiki:emacs/til
 
 (defun pile-path-abs-project (abs-path)
