@@ -47,13 +47,15 @@
 
 (defun pile-link-export (path desc backend)
   "Export fn for link"
-  (if (eq backend 'html)
-      (let* ((parse (pile-path-parse path))
-             (pj (alist-get 'project parse))
-             (internal-suffix (--if-let (alist-get 'internal-path parse) (format "#sec-%s" (pile--name-to-id it)) "")))
-        (format "<a class=\"pile-link\" href=\"/%s/%s%s\">%s</a>" (oref pj :base-url)
-                (f-swap-ext (pile-path-rel-to-org (alist-get 'rel-path parse) pj) "html")
-                internal-suffix desc))))
+  (when (eq backend 'html)
+    (let* ((parse (pile-path-parse path))
+           (pj (alist-get 'project parse))
+           (internal-suffix (--if-let (alist-get 'internal-path parse) (format "#sec-%s" (pile--name-to-id it)) ""))
+           (pj-base-url (oref pj :base-url))
+           (base-prefix (if (string= pj-base-url "") "" (concat "/" pj-base-url))))
+      (format "<a class=\"pile-link\" href=\"%s/%s%s\">%s</a>" base-prefix
+              (f-swap-ext (pile-path-rel-to-org (alist-get 'rel-path parse) pj) "html")
+              internal-suffix desc))))
 
 (provide 'pile-link)
 
