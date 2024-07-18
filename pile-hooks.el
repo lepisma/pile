@@ -35,6 +35,7 @@
 (require 'pile-setupfile)
 (require 'pile-tags)
 (require 'pile-utils)
+(require 'pile-watermark)
 (require 's)
 
 (defun pile-hooks-pre-add-bc (_export-backend)
@@ -79,6 +80,11 @@ bc hook."
   "Add list of formatted tags to the buffer."
   (pile-when-type '(blog)
     (pile-tags-add)))
+
+(defun pile-hooks-pre-add-draft-watermark (_export-backend)
+  "Add DRAFT watermark in any page with draft tag set to true."
+  (when (alist-get 'draft (pile-read-options))
+    (pile-watermark-add "DRAFT")))
 
 (defun pile-hooks-post-generate-atom (ifile ofile)
   "Regenerate atom files for the current project."
