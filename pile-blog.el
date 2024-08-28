@@ -29,7 +29,6 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'f)
-(require 'helm)
 (require 'pile-base)
 (require 'pile-utils)
 (require 'pile-archive)
@@ -52,18 +51,20 @@
   "Tell if the project is a valid blog"
   (f-exists-p (f-join (oref pj :input-dir) "index.org")))
 
-(defun pile-blog--choose-project (&optional helm-buffer-name)
-  "Return a blog project using helm selector."
-  (helm :sources (helm-build-sync-source "Pile blog projects"
-                   :candidates (-map (lambda (pj) (cons (oref pj :name) pj))
-                                     (-filter (lambda (pj) (and (pile-project-blog-p pj) (pile-blog-valid? pj))) pile-projects)))
-        :buffer (or helm-buffer-name "*helm pile blog*")))
+(defun pile-blog--choose-project ()
+  "Return a blog project using completing read."
+  (let* ((collection (mapcar (lambda (pj) (cons (oref pj :name) pj))))
+         (completion-match (completing-read "Pile blog projects: " collection
+                                            (lambda (pj)
+                                              (and (pile-project-blog-p pj)
+                                                   (pile-blog-valid? pj))))))
+    (alist-get completion-match collection nil nil #'string-equal)))
 
 ;;;###autoload
 (defun pile-blog-new-post ()
   "Create a new post based on current date."
   (interactive)
-  (let ((pj (pile-blog--choose-project "*helm pile blog new post*")))
+  (let ((pj (pile-blog--choose-project)))
     (find-file (pile-blog--create-post pj (read-string "Post name: ")))))
 
 ;;;###autoload
@@ -72,14 +73,12 @@
   (interactive)
   (let* ((pj (pile-blog--choose-project))
          (default-directory (oref pj :input-dir))
-         (items (->> (pile-archive-parse) (-sort #'pile-archive-comparator))))
-    (helm :sources (helm-build-sync-source "Posts"
-                     :candidates (-map (lambda (post) (cons (alist-get 'title post) post)) items)
-                     :action `(("Open post" . (lambda (post) (pile-blog-open-post ,pj post)))
-                               ("Insert link" . (lambda (post) (pile-blog-insert-link ,pj post)))
-                               ("Delete post" . (lambda (post) (pile-blog-delete-post ,pj post)))
-                               ("Redate post" . (lambda (post) (pile-blog-redate-post ,pj post)))))
-          :buffer "*helm pile posts*")))
+         (items (->> (pile-archive-parse) (-sort #'pile-archive-comparator)))
+         (collection (mapcar (lambda (post) (cons (alist-get 'title post))) items))
+         (completion-match (completing-read "Posts: " collection)))
+    ;; TODO: need to use something like embark or recursive completing-reads to
+    ;; enable link insertion, post deletion, and redating.
+    (pile-blog-open-post (alist-get completion-match collection nil nil #'string-equal))))
 
 (defun pile-blog-open-post (pj post)
   "Open POST for editing."

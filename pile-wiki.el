@@ -31,13 +31,14 @@
 (require 'pile-base)
 (require 'pile-archive)
 
-(defun pile-wiki--choose-project (&optional helm-buffer-name)
+(defun pile-wiki--choose-project ()
+  "Run a minibuffer completion act to return a wiki-project."
   (let ((wiki-projects (-filter #'pile-project-wiki-p pile-projects)))
     (if (< (length wiki-projects) 2)
         (car wiki-projects)
-      (helm :sources (helm-build-sync-source "Pile wiki projects"
-                       :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj)) wiki-projects))
-            :buffer (or helm-buffer-name "*helm pile wiki*")))))
+      (let* ((collection (mapcar (lambda (pj) (cons (oref pj :name) pj)) wiki-projects))
+             (completion-match (completing-read "Pile wiki projects: " collection)))
+        (alist-get completion-match collection nil nil #'string-equal)))))
 
 ;;;###autoload
 (defun pile-wiki ()

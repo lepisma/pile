@@ -4,7 +4,7 @@
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
 ;; Version: 0.6.0
-;; Package-Requires: ((emacs "27") (dash "2.18.0") (f "0.20.0") (helm "3.7.1") (ht "2.2") (mustache "0.24") (org-ref "1.1.1") (s "1.12.0"))
+;; Package-Requires: ((emacs "27") (dash "2.18.0") (f "0.20.0") (ht "2.2") (mustache "0.24") (org-ref "1.1.1") (s "1.12.0"))
 ;; URL: https://github.com/lepisma/pile
 
 ;;; Commentary:
@@ -55,7 +55,6 @@
 (require 'ox-html)
 (require 'ox-publish)
 (require 's)
-(require 'helm)
 
 (defgroup pile nil
   "Pile wiki"
@@ -94,10 +93,9 @@ These functions are directly appended to org-publish-after-publishing-hook."
 ;;;###autoload
 (defun pile-publish (arg)
   (interactive "P")
-  (helm :sources (helm-build-sync-source "Pile projects"
-                   :candidates (mapcar (lambda (pj) (cons (oref pj :name) pj)) pile-projects)
-                   :action (lambda (pj) (pile-project-publish pj arg)))
-        :buffer "*helm pile publish*"))
+  (let* ((collection (mapcap (lambda (pj) (cons (oref pj :name) pj)) pile-projects))
+         (completion-match (completing-read "Pile projects: " collection)))
+    (pile-project-publish (alist-get completion-match collection nil nil #'string-equal) arg)))
 
 ;;;###autoload
 (defun pile-setup ()

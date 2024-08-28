@@ -28,7 +28,6 @@
 
 (require 'dash)
 (require 'f)
-(require 'helm)
 (require 'pile-base)
 (require 'pile-date)
 (require 'pile-tags)

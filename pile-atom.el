@@ -28,7 +28,6 @@
 
 (require 'dash)
 (require 'f)
-(require 'helm)
 (require 'ht)
 (require 'mustache)
 (require 'pile-base)
