@@ -6,7 +6,7 @@
 (depends-on "ht" "2.2")
 (depends-on "mustache" "0.25")
 (depends-on "org-plus-contrib")
-(depends-on "org-ref" "1.1.1")
+(depends-on "org-ref" "2.0.0")
 (depends-on "s" "1.12.0")
 
 (development

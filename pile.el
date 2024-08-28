@@ -4,7 +4,7 @@
 
 ;; Author: Abhinav Tushar <lepisma@fastmail.com>
 ;; Version: 0.6.0
-;; Package-Requires: ((emacs "27") (dash "2.18.0") (f "0.20.0") (ht "2.2") (mustache "0.24") (org-ref "1.1.1") (s "1.12.0"))
+;; Package-Requires: ((emacs "27") (dash "2.18.0") (f "0.20.0") (ht "2.2") (mustache "0.24") (org-ref "2.0.0") (s "1.12.0"))
 ;; URL: https://github.com/lepisma/pile
 
 ;;; Commentary:
