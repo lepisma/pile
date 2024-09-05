@@ -53,12 +53,14 @@
 
 (defun pile-blog--choose-project ()
   "Return a blog project using completing read."
-  (let* ((collection (mapcar (lambda (pj) (cons (oref pj :name) pj))))
-         (completion-match (completing-read "Pile blog projects: " collection
-                                            (lambda (pj)
-                                              (and (pile-project-blog-p pj)
-                                                   (pile-blog-valid? pj))))))
-    (alist-get completion-match collection nil nil #'string-equal)))
+  (let ((blog-projects (-filter (lambda (pj) (and (pile-project-blog-p pj)
+                                                  (pile-blog-valid? pj)))
+                                pile-projects)))
+    (if (< (length blog-projects) 2)
+        (car blog-projects)
+      (let* ((collection (mapcar (lambda (pj) (cons (oref pj :name) pj)) blog-projects))
+             (completion-match (completing-read "Pile blog projects: " collection)))
+        (alist-get completion-match collection nil nil #'string-equal)))))
 
 ;;;###autoload
 (defun pile-blog-new-post ()
