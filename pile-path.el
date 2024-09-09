@@ -70,7 +70,7 @@ for static files if found."
     (let ((splits (s-split-up-to "::" rest-path 1)))
       `((project . ,(pile-get-project pname))
         (rel-path . ,(car splits))
-        (internal-path . ,(second splits))))))
+        (internal-path . ,(cl-second splits))))))
 
 (defun pile-path-abs (pile-path)
   "Ignoring the internal link"
