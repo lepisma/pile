@@ -47,7 +47,7 @@
   "Return page title for the path given"
   (let ((splits (reverse (s-split "/" rel-path))))
     (if (string-equal (car splits) "index")
-        (or (second splits) "home")
+        (or (cl-second splits) "home")
       (car splits))))
 
 (defun pile-bc--linkify-parents (parents)
