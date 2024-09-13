@@ -93,7 +93,7 @@ These functions are directly appended to org-publish-after-publishing-hook."
 ;;;###autoload
 (defun pile-publish (arg)
   (interactive "P")
-  (let* ((collection (mapcap (lambda (pj) (cons (oref pj :name) pj)) pile-projects))
+  (let* ((collection (mapcar (lambda (pj) (cons (oref pj :name) pj)) pile-projects))
          (completion-match (completing-read "Pile projects: " collection)))
     (pile-project-publish (alist-get completion-match collection nil nil #'string-equal) arg)))
 
