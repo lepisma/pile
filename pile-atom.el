@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'eieio)
 (require 'f)
 (require 'ht)
 (require 'mustache)

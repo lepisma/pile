@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'eieio)
 (require 'pile-atom)
 (require 'pile-bc)
 (require 'pile-cids)

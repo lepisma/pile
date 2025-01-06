@@ -29,6 +29,7 @@
 
 ;;; Code:
 
+(require 'eieio)
 (require 'dash)
 (require 'f)
 (require 'pile-base)

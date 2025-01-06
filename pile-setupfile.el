@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'eieio)
 (require 'pile-utils)
 
 (defun pile-setupfile-added? ()

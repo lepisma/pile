@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'eieio)
 (require 'dash)
 (require 'f)
 (require 's)

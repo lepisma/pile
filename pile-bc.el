@@ -26,6 +26,7 @@
 
 ;;; Code:
 
+(require 'eieio)
 (require 'f)
 (require 'pile-utils)
 (require 's)

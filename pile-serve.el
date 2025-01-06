@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'dash)
+(require 'eieio)
 (require 'pile-path)
 (require 'w)
 
