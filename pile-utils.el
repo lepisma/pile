@@ -109,7 +109,7 @@ empty."
       (->> (match-string-no-properties 1)
          s-trim
          (s-split " ")
-         (-map (lambda (kv) (-let [(k . v) (s-split ":" kv)] (cons (intern k) (read v)))))))))
+         (-map (lambda (kv) (-let [(k v) (s-split ":" kv)] (cons (intern k) (read v)))))))))
 
 ;;;###autoload
 (defun pile-clear-cache ()
