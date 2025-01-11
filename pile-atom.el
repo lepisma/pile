@@ -44,14 +44,16 @@
   <updated>{{ root-date }}</updated>
   <author><name>{{ root-author }}</name></author>
   <generator>pile</generator>
-  {{#entry}}
+  {{#entries}}
   <entry>
     <title>{{ title }}</title>
     <link href=\"{{ link }}\"/>
     <updated>{{ date }}</updated>
-    {{#tags}}<category term=\"{{ tag }}\" />{{/tags}}
+    {{#tags}}
+    <category term=\"{{ tag }}\"/>
+    {{/tags}}
   </entry>
-  {{/entry}}
+  {{/entries}}
 </feed>"
   "Template for atom.xml file")
 
@@ -63,7 +65,7 @@
                            base-url-text
                            (s-chop-prefix "./" (s-replace-regexp "\\.org$" ".html" link)))))
     (setf (alist-get 'link archive-item) new-link)
-    (setf (alist-get 'tags archive-item) (mapcar (lambda (tag) (list (cons 'tag tag))) (alist-get 'tags archive-item)))
+    (setf (alist-get 'tags archive-item) (mapcar (lambda (tag) (ht<-alist (list (cons "tag" tag)))) (alist-get 'tags archive-item)))
     (let ((archive-item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) archive-item)))
       (ht<-alist archive-item))))
 
@@ -77,7 +79,7 @@
                          ("root-url" (concat (file-name-as-directory (oref pj :root-url))
                                              (oref pj :base-url)))
                          ("root-date" (format-time-string "%FT%T%z"))
-                         ("entry" (mapcar (lambda (it) (pile-atom-parse-archive-item pj it)) items))))))
+                         ("entries" (mapcar (lambda (it) (pile-atom-parse-archive-item pj it)) items))))))
 
 (cl-defmethod pile-atom-generate ((pj pile-project-blog))
   "Regenerate atom.xml file for project PJ. Also copy the file in deploy
