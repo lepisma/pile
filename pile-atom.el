@@ -43,7 +43,6 @@
   <link href=\"{{ root-url }}/atom.xml\" rel=\"self\"/>
   <updated>{{ root-date }}</updated>
   <author><name>{{ root-author }}</name></author>
-
   {{#entry}}
   <entry>
     <title>{{ title }}</title>
@@ -71,7 +70,7 @@
          (items (->> (pile-archive-parse) (-remove #'pile-archive-draft-p) (-sort #'pile-archive-comparator))))
     (mustache-render pile-atom-template
                      (ht ("root-author" (user-full-name))
-                         ("root-title" (oref pj :name))
+                         ("root-title" (or (oref pj :site-title) (oref pj :name)))
                          ("root-url" (concat (file-name-as-directory (oref pj :root-url))
                                              (oref pj :base-url)))
                          ("root-date" (format-time-string "%FT%T%z"))

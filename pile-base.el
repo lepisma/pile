@@ -33,7 +33,7 @@
 (defclass pile-project ()
   ((name :initarg :name
          :type string
-         :documentation "Name for the project")
+         :documentation "Unique name for the project")
    (root-url :initarg :root-url
              :initform ""
              :type string
@@ -61,7 +61,11 @@
               :documentation "Path to the setup file for
               inclusion before exporting. The SETUP happens just
               after TITLE and so your can do overrides as
-              needed."))
+              needed.")
+   (site-title :initarg :site-title
+               :type (or null string)
+               :initform nil
+               :documentation "Title of the project for generated site"))
   :abstract t
   :documentation "Base project type for pile")
 
