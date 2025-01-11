@@ -43,6 +43,7 @@
   <link href=\"{{ root-url }}/atom.xml\" rel=\"self\"/>
   <updated>{{ root-date }}</updated>
   <author><name>{{ root-author }}</name></author>
+  <generator>pile</generator>
   {{#entry}}
   <entry>
     <title>{{ title }}</title>
