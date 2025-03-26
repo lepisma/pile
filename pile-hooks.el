@@ -131,10 +131,8 @@ directory."
         (let ((output-dir (f-parent ofile)))
           (dolist (entry (pile-get-static-items ifile))
             (message "Going to copy: %s" entry)
-            (let ((output-file-path (f-join (file-name-as-directory output-dir))))
-              (when (f-exists? output-file-path)
-                (f-delete output-file-path t))
-              (f-copy entry (file-name-as-directory output-dir)))))))))
+            ;; (f-copy entry (file-name-as-directory output-dir)))
+          ))))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
