@@ -79,15 +79,36 @@ open if we had it already open, else close."
   "Return project from FILE."
   (-find (lambda (pj) (s-starts-with? (oref pj :input-dir) file)) pile-projects))
 
+(defun pile-dir-blog-year? (dir)
+  "Tell if the DIR is year entry for a blog project.
+
+This is helpful for `pile-get-static-items'."
+  (let ((parent (f-parent dir)))
+    ;; Check that parent of this has an index
+    (and (or (f-exists? (f-join parent "index.org"))
+             (f-exists? (f-join parent "index.html")))
+         ;; Then check that this directory is named as an year
+         (s-matches? "[[:digit:]]\\{4\\}" (f-base dir))
+         ;; Then check if its children are all month directories
+         (-all? (lambda (entry)
+                  (s-matches? "[[:digit:]]\\{2\\}" (f-base entry)))
+                (f-entries dir)))))
+
 (defun pile-get-static-items (file)
-  "Return static items for accompanying FILE. FILE can be Org
-mode (input) or HTML file (output)."
+  "Return static items for accompanying FILE.
+
+FILE can be Org mode (input) or HTML file (output)."
   (let ((parent (f-parent file)))
     (->> (f-entries parent)
-       (-remove (lambda (entry) (s-matches? "\\.\\(org\\|html\\)$" entry)))
-       (-remove (lambda (entry) (and (f-dir? entry))
-                                (or (f-exists? (f-join entry "index.org"))
-                                    (f-exists? (f-join entry "index.html"))))))))
+         ;; Skip org or html files since they are usually inputs and outputs
+         (-remove (lambda (entry) (s-matches? "\\.\\(org\\|html\\)$" entry)))
+         ;; Remove sibling directories that are housing an index.{org|html}
+         ;; since they are other pages which will be handled separately
+         (-remove (lambda (entry) (and (f-dir? entry)
+                                       (or (f-exists? (f-join entry "index.org"))
+                                           (f-exists? (f-join entry "index.html"))
+                                           ;; Remove directories that are date paths for blog projects
+                                           (pile-dir-blog-year? entry))))))))
 
 (defun pile-clean-up-parents (path)
   "Delete parent directories for the given path if they are all
