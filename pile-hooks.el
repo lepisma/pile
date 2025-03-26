@@ -124,7 +124,9 @@ directory."
         ;; First we delete all items from output directory.
         (dolist (entry (pile-get-static-items ofile))
           (message "Going to delete: %s" entry)
-          (f-delete entry t))
+          ;; TODO: Fix this for / blog project. It works for /journal
+          ;; (f-delete entry t)
+          )
         ;; Then copy over items from input to output.
         (let ((output-dir (f-parent ofile)))
           (dolist (entry (pile-get-static-items ifile))
