@@ -121,18 +121,18 @@ directory."
   (when (s-ends-with-p ".html" ofile)
     (let ((pj (pile-get-project-from-file ifile)))
       (pile-when-project-type pj '(blog wiki)
-        ;; First we delete all items from output directory.
-        (dolist (entry (pile-get-static-items ofile))
-          (message "Going to delete: %s" entry)
-          ;; TODO: Fix this for / blog project. It works for /journal
-          ;; (f-delete entry t)
-          )
-        ;; Then copy over items from input to output.
-        (let ((output-dir (f-parent ofile)))
-          (dolist (entry (pile-get-static-items ifile))
-            (message "Going to copy: %s" entry)
-            ;; (f-copy entry (file-name-as-directory output-dir)))
-          ))))))
+        ;; In case this is the root page, we will not do anything since root
+        ;; pages could have some other sources of static files.
+        (unless (pile-archive-page-p ifile)
+          ;; First we delete all items from output directory.
+          (dolist (entry (pile-get-static-items ofile))
+            (message "[pile] Going to delete: %s" entry)
+            (f-delete entry t))
+          ;; Then copy over items from input to output.
+          (let ((output-dir (f-parent ofile)))
+            (dolist (entry (pile-get-static-items ifile))
+              (message "[pile] Going to copy: %s" entry)
+              (f-copy entry (file-name-as-directory output-dir)))))))))
 
 (defun pile-hooks-post-generate-archive (ifile ofile)
   "Regenerate the archive (index page) for the project."
