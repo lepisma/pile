@@ -105,18 +105,6 @@ runs them one by one."
       (when (s-ends-with-p ".html" ofile)
         (pile-atom-generate pj)))))
 
-(defun pile-hooks-post-stringify-title (ifile ofile)
-  "Make the title plain text in the generated html."
-  (let ((pj (pile-get-project-from-file ifile)))
-    (pile-when-project-type pj '(blog wiki plain)
-      (when (s-ends-with-p ".html" ofile)
-        (pile-temp-open ofile
-          (goto-char (point-min))
-          (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
-            (let ((old-title (match-string-no-properties 1)))
-              (replace-match (s-replace-regexp "/" "" (s-replace-regexp "<.*?>" "" old-title)) nil nil nil 1)))
-          (if (buffer-modified-p) (save-buffer)))))))
-
 (defun pile-hooks-post-sync-static-files (ifile ofile)
   "Sync static files (non-org) from input directory to output
 directory."

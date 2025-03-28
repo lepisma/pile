@@ -31,6 +31,14 @@
 (require 'f)
 (require 's)
 
+(defun pile-stringify-title ()
+  "Remove markups from current HTML buffer title."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
+      (let ((old-title (match-string-no-properties 1)))
+        (replace-match (s-replace-regexp "/" "" (s-replace-regexp "<.*?>" "" old-title)) nil nil nil 1)))))
+
 (defmacro pile-temp-open (filename &rest body)
   "Temporary open a file and work there. When done, keep the file
 open if we had it already open, else close."
