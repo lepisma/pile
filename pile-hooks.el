@@ -87,21 +87,23 @@ bc hook."
   (when (alist-get 'draft (pile-read-options))
     (pile-watermark-add "DRAFT")))
 
+(defmacro pile-hooks-html-post-processing-factory (post-processing-fns)
+  "Take all HTML buffer POST-PROCESSING-FNS and return a single hook that
+runs them one by one."
+  `(lambda (ifile ofile)
+     (let ((pj (pile-get-project-from-file ifile)))
+       (pile-when-project-type pj '(blog wiki plain)
+         (when (s-ends-with-p ".html" ofile)
+           (pile-temp-open ofile
+             (mapc #'funcall ,post-processing-fns)
+             (if (buffer-modified-p) (save-buffer))))))))
+
 (defun pile-hooks-post-generate-atom (ifile ofile)
   "Regenerate atom files for the current project."
   (let ((pj (pile-get-project-from-file ifile)))
     (pile-when-project-type pj '(blog)
       (when (s-ends-with-p ".html" ofile)
         (pile-atom-generate pj)))))
-
-(defun pile-hooks-post-clear-cids (ifile ofile)
-  "Remove CUSTOM_ID related divs from the generated html."
-  (let ((pj (pile-get-project-from-file ifile)))
-    (pile-when-project-type pj '(blog wiki plain)
-      (when (s-ends-with-p ".html" ofile)
-        (pile-temp-open ofile
-          (pile-cids-clear-html)
-          (if (buffer-modified-p) (save-buffer)))))))
 
 (defun pile-hooks-post-stringify-title (ifile ofile)
   "Make the title plain text in the generated html."
