@@ -32,6 +32,22 @@
 (require 's)
 
 (defun pile-stringify-title ()
+  "Remove markups from current HTML buffer title, including Org mode HTML macros."
+  (save-excursion
+    (goto-char (point-min))
+    (when (re-search-forward "<title>\\(.*\\)</title>" nil t)
+      (let ((old-title (match-string-no-properties 1))
+            cleaned-title)
+        ;; First, remove HTML tags
+        (setq cleaned-title (s-replace-regexp "<.*?>" "" old-title))
+        ;; Then, handle Org mode HTML macros like @@html:<span style=\"color: gray\">@@
+        ;; This regex captures the content inside @@html:...@@ and removes the entire macro.
+        (setq cleaned-title (s-replace-regexp "@@html:[^@]*@@" "" cleaned-title))
+        ;; Finally, remove forward slashes
+        (setq cleaned-title (s-replace-regexp "/" "" cleaned-title))
+        (replace-match cleaned-title nil nil nil 1)))))
+
+(defun pile-stringify-title ()
   "Remove markups from current HTML buffer title."
   (save-excursion
     (goto-char (point-min))

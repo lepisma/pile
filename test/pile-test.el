@@ -7,6 +7,64 @@
 (require 'pile-tags)
 (require 'pile-utils)
 (require 'pile)
+(require 'ert)
+(require 's)
+
+(ert-deftest pile-stringify-title-basic-html ()
+  "Test basic HTML tag removal from title."
+  (with-temp-buffer
+    (insert "<html><head><title>My <span style=\"color:red;\">Awesome</span> Title</title></head><body></body></html>")
+    (pile-stringify-title)
+    (should (string-match-p "<title>My Awesome Title</title>" (buffer-string)))))
+
+(ert-deftest pile-stringify-title-with-slashes ()
+  "Test removal of forward slashes from title."
+  (with-temp-buffer
+    (insert "<html><head><title>Path/To/My/File</title></head><body></body></html>")
+    (pile-stringify-title)
+    ;; The expected result should be "PathToMyFile" if all slashes are removed.
+    (should (string-match-p "<title>PathToMyFile</title>" (buffer-string)))))
+
+(ert-deftest pile-stringify-title-with-org-macros ()
+  "Test removal of Org mode HTML macros from title."
+  (with-temp-buffer
+    (insert "<html><head><title>The Urge to Sh@@html:<span style=\"color: gray\">@@o@@html:</span>@@rt@@html:<span style=\"color: gray\">@@e@@html:</span>@@n</title></head><body></body></html>")
+    (pile-stringify-title)
+    (should (string-match-p "<title>The Urge to Shorten</title>" (buffer-string)))))
+
+(ert-deftest pile-stringify-title-combined-case ()
+  "Test combined HTML tags, slashes, and Org macros."
+  (with-temp-buffer
+    (insert "<html><head><title>A <a href=\"#\">Mixed/Bag</a> of @@html:<b>@@HTML@@html:</b>@@/Org</title></head><body></body></html>")
+    (pile-stringify-title)
+    (should (string-match-p "<title>A MixedBag of HTMLOrg</title>" (buffer-string)))))
+
+(ert-deftest pile-stringify-title-no-title ()
+  "Test case where no title tag is present."
+  (with-temp-buffer
+    (insert "<html><head></head><body><h1>No Title Here</h1></body></html>")
+    (pile-stringify-title)
+    ;; The buffer content should remain unchanged
+    (should (string= (buffer-string) "<html><head></head><body><h1>No Title Here</h1></body></html>")))
+  (with-temp-buffer
+    (insert "Some random text without HTML.")
+    (pile-stringify-title)
+    ;; The buffer content should remain unchanged
+    (should (string= (buffer-string) "Some random text without HTML."))))
+
+(ert-deftest pile-stringify-title-empty-title ()
+  "Test case with an empty title tag."
+  (with-temp-buffer
+    (insert "<html><head><title></title></head><body></body></html>")
+    (pile-stringify-title)
+    (should (string-match-p "<title></title>" (buffer-string)))))
+
+(ert-deftest pile-stringify-title-nested-org-macros ()
+  "Test nested or complex Org macros (should still clean)."
+  (with-temp-buffer
+    (insert "<html><head><title>Nested @@html:<i>@@One@@html:</i>@@ and @@html:<span class=\"inner\">@@Two@@html:</span>@@</title></head><body></body></html>")
+    (pile-stringify-title)
+    (should (string-match-p "<title>Nested One and Two</title>" (buffer-string)))))
 
 (describe "Option parsing"
   (it "works"
