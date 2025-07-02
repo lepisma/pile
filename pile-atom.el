@@ -64,6 +64,7 @@
          (new-link (concat (file-name-as-directory (oref pj :root-url))
                            base-url-text
                            (s-chop-prefix "./" (s-replace-regexp "\\.org$" ".html" link)))))
+    (setf (alist-get 'title archive-item) (pile-stringify-text (alist-get 'title archive-item)))
     (setf (alist-get 'link archive-item) new-link)
     (setf (alist-get 'tags archive-item) (mapcar (lambda (tag) (ht<-alist (list (cons "tag" tag)))) (alist-get 'tags archive-item)))
     (let ((archive-item (mapcar (lambda (kv) (cons (symbol-name (car kv)) (cdr kv))) archive-item)))
