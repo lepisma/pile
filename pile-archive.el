@@ -89,7 +89,9 @@ deployment path."
 [[file:%s][%s]]
 %s
 #+HTML: </div>"
-            (alist-get 'date page-alist)
+            ;; We change the date from '%Y-%m-%d' to '%a, %d %B, %Y' for pretty
+            ;; printing in main listings
+            (format-time-string "%A, %d %B, %Y" (encode-time (append '(0 0 0) (nthcdr 3 (parse-time-string (alist-get 'date page-alist))))))
             (alist-get 'link page-alist)
             (alist-get 'title page-alist)
             (if tags (pile-tags-format-tags tags) ""))))
